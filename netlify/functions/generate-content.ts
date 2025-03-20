@@ -99,15 +99,20 @@ export const handler: Handler = async (event) => {
     const content = completion.choices[0].message.content || '{}';
     
     try {
+      // Clean up markdown formatting if present
+      const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
+      console.log('Cleaned content:', cleanContent);
+      
       // Validate that we got valid JSON back
-      const parsedContent = JSON.parse(content);
+      const parsedContent = JSON.parse(cleanContent);
       return {
         statusCode: 200,
         headers,
-        body: content
+        body: JSON.stringify(parsedContent)
       };
     } catch (parseError) {
       console.error('Failed to parse OpenAI response:', content);
+      console.error('Parse error:', parseError);
       throw new Error('Invalid response format from OpenAI');
     }
 
