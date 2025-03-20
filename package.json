@@ -10,12 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@netlify/functions": "^2.6.0",
+    "@netlify/functions": "^2.8.2",
     "@radix-ui/react-toggle-group": "^1.0.7",
     "axios": "^1.6.7",
     "colorthief": "^2.4.0",
     "html-to-image": "^1.11.11",
     "lucide-react": "^0.344.0",
+    "openai": "^4.88.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1"
