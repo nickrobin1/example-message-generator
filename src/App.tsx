@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Video, User, MessageCircle, Search } from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
 import DeviceFrame from './components/DeviceFrame';
 import ChannelToggle from './components/ChannelToggle';
 import SMSEditor from './components/channels/SMSEditor';
@@ -50,7 +51,7 @@ function App() {
 
     if (!domain) {
       console.warn('No domain provided');
-      alert('Please enter a domain');
+      toast.error('Please enter a domain');
       return;
     }
 
@@ -77,6 +78,11 @@ function App() {
       const data = await response.json();
       console.log('Received brand data:', data);
       
+      if (!data.name && !data.logo) {
+        toast.error('No brand information found. Please enter details manually.');
+        return;
+      }
+
       console.log('Updating content state with brand information...');
       setContent(prev => {
         const newContent = {
@@ -101,13 +107,15 @@ function App() {
           inAppBody: data.description
         }));
       }
+
+      toast.success('Brand information updated successfully!');
     } catch (error) {
       console.error('Brand lookup error:', error);
       console.error('Full error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       });
-      alert(error instanceof Error ? error.message : 'Failed to look up brand. Please enter details manually.');
+      toast.error('We were unable to lookup brand, please insert the brand info manually.');
     } finally {
       console.log('Brand lookup completed');
       setLoading(false);
@@ -116,6 +124,26 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#333',
+            color: '#fff',
+          },
+          success: {
+            style: {
+              background: 'green',
+            },
+          },
+          error: {
+            style: {
+              background: '#d63031',
+            },
+          },
+        }}
+      />
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-2xl font-bold text-gray-900">Braze Preview Generator</h1>
