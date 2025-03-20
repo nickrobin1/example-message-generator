@@ -81,13 +81,21 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  // Sanitize the domain by removing protocol and path
-  const sanitizedDomain = domain
-    .replace(/^(https?:\/\/)?(www\.)?/, '') // Remove protocol and www
-    .split('/')[0] // Remove any paths
-    .toLowerCase(); // Convert to lowercase
-
-  console.log('Sanitized domain:', sanitizedDomain);
+  // Sanitize the domain by properly parsing the URL
+  let sanitizedDomain;
+  try {
+    // Add protocol if missing to make URL parsing work
+    const urlString = domain.startsWith('http') ? domain : `https://${domain}`;
+    const url = new URL(urlString);
+    sanitizedDomain = url.hostname.replace('www.', '');
+    console.log('Sanitized domain:', sanitizedDomain);
+  } catch (error) {
+    console.error('Error parsing URL:', error);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Invalid domain format' })
+    };
+  }
 
   try {
     console.log('Making request to Brandfetch API...');
