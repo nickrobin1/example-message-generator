@@ -171,6 +171,7 @@ function App() {
         domain: '',
         logo: content.logoUrl,
         description: content.brandDescription,
+        longDescription: content.brandDescription,
         colors: {
           primary: '',
           all: []
