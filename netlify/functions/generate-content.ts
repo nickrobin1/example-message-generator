@@ -7,7 +7,9 @@ export const handler: Handler = async (event) => {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Referrer-Policy': 'no-referrer-when-downgrade',
+    'Access-Control-Allow-Credentials': 'true'
   };
 
   // Handle preflight requests
