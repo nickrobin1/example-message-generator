@@ -7,6 +7,10 @@ const API_BASE_URL = import.meta.env.PROD
 
 export async function generateMarketingContent(brandData: BrandFetchResponse): Promise<Partial<MarketingContent>> {
   console.log('Generating content with API URL:', API_BASE_URL);
+  console.log('Request payload:', {
+    brand: brandData,
+    model: 'gpt-4'
+  });
   
   try {
     const response = await fetch(`${API_BASE_URL}/.netlify/functions/generate-content`, {
@@ -16,11 +20,12 @@ export async function generateMarketingContent(brandData: BrandFetchResponse): P
       },
       body: JSON.stringify({
         brand: brandData,
-        model: 'gpt-4o', // Using the specified model
+        model: 'gpt-4', // Fixed model name
       }),
     });
 
     console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       let errorMessage = 'Failed to generate content';

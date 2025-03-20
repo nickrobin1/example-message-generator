@@ -2,6 +2,22 @@ import { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
 
 export const handler: Handler = async (event) => {
+  // Debug request details
+  console.log('Request details:', {
+    method: event.httpMethod,
+    path: event.path,
+    headers: event.headers,
+    queryStringParameters: event.queryStringParameters,
+    isBase64Encoded: event.isBase64Encoded
+  });
+
+  // Debug environment variables
+  console.log('Environment variables:', {
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'exists' : 'missing',
+    OPENAI_API_KEY_LENGTH: process.env.OPENAI_API_KEY?.length || 0,
+    ALL_ENV_VARS: Object.keys(process.env)
+  });
+
   // Always return CORS headers for all responses
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -30,6 +46,12 @@ export const handler: Handler = async (event) => {
   }
 
   try {
+    // Debug: Log available environment variables
+    console.log('Available environment variables:', Object.keys(process.env));
+    console.log('OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
+    console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length || 0);
+    console.log('Request body:', event.body);
+
     if (!process.env.OPENAI_API_KEY) {
       throw new Error('OpenAI API key is not configured');
     }
@@ -41,6 +63,7 @@ export const handler: Handler = async (event) => {
     const { brand } = JSON.parse(event.body || '{}');
     
     if (!brand?.description) {
+      console.error('Missing brand description:', brand);
       throw new Error('Brand description is required');
     }
 
