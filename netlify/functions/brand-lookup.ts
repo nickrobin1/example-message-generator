@@ -82,39 +82,9 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  // Extract the domain properly using URL parsing
-  let sanitizedDomain;
-  try {
-    // If it looks like a URL, parse it properly
-    if (domain.includes('://') || domain.includes('.')) {
-      console.log('Input looks like a URL, attempting to parse...');
-      // Ensure we have a protocol for URL parsing
-      const urlToParse = domain.includes('://') ? domain : `https://${domain}`;
-      console.log('URL to parse:', urlToParse);
-      const parsedUrl = new URL(urlToParse);
-      console.log('Parsed URL hostname:', parsedUrl.hostname);
-      // Get hostname and remove www. if present
-      sanitizedDomain = parsedUrl.hostname.replace(/^www\./, '');
-      console.log('After www removal:', sanitizedDomain);
-    } else {
-      console.log('Input does not look like a URL, using as is:', domain);
-      sanitizedDomain = domain;
-    }
-  } catch (error) {
-    // If URL parsing fails, fallback to regex-based approach
-    console.error('URL parsing failed, using fallback. Error:', error);
-    sanitizedDomain = domain
-      .replace(/^https?:\/\//, '') // Remove protocol
-      .replace(/^www\./, '')       // Remove www
-      .split('/')[0];              // Remove any paths
-    console.log('After fallback processing:', sanitizedDomain);
-  }
-
-  console.log('Final sanitized domain:', sanitizedDomain);
-
   try {
     console.log('Making request to Brandfetch API...');
-    const response = await axios.get(`https://api.brandfetch.io/v2/brands/${sanitizedDomain}`, {
+    const response = await axios.get(`https://api.brandfetch.io/v2/brands/${domain}`, {
       headers: {
         'Authorization': `Bearer ${process.env.BRANDFETCH_API_KEY}`
       }

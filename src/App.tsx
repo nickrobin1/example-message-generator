@@ -81,6 +81,27 @@ function App() {
     );
   };
 
+  // Function to sanitize domain before API call
+  const sanitizeDomain = (url: string): string => {
+    try {
+      // If it looks like a URL, parse it properly
+      if (url.includes('://') || url.includes('.')) {
+        // Ensure we have a protocol for URL parsing
+        const urlToParse = url.includes('://') ? url : `https://${url}`;
+        const parsedUrl = new URL(urlToParse);
+        // Get hostname and remove www. if present
+        return parsedUrl.hostname.replace(/^www\./, '');
+      }
+      return url;
+    } catch (error) {
+      // If URL parsing fails, fallback to regex-based approach
+      return url
+        .replace(/^https?:\/\//, '') // Remove protocol
+        .replace(/^www\./, '')       // Remove www
+        .split('/')[0];              // Remove any paths
+    }
+  };
+
   const handleBrandLookup = async (domain: string) => {
     console.log('Starting brand lookup for domain:', domain);
     console.log('Using API URL:', API_BASE_URL);
@@ -91,8 +112,12 @@ function App() {
       return;
     }
 
+    // Sanitize the domain before making the API call
+    const sanitizedDomain = sanitizeDomain(domain);
+    console.log('Sanitized domain:', sanitizedDomain);
+
     setLoading(true);
-    const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(domain)}`;
+    const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(sanitizedDomain)}`;
     console.log('Making request to:', requestUrl);
 
     try {
