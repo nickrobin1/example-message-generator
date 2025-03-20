@@ -1,10 +1,6 @@
 import { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
 export const handler: Handler = async (event) => {
   // Handle CORS
   const headers = {
@@ -27,6 +23,14 @@ export const handler: Handler = async (event) => {
   }
 
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key is not configured');
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
     const { brand } = JSON.parse(event.body || '{}');
     
     if (!brand?.description) {
