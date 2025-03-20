@@ -1,82 +1,52 @@
-import type { BrandFetchResponse, AIGeneratedContent } from '../types';
+import type { BrandFetchResponse, MarketingContent } from '../types';
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+// Use environment variable or fallback to local API URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8888/.netlify/functions';
 
-function cleanJsonResponse(response: string): string {
-  // Remove markdown code blocks and any leading/trailing whitespace
-  return response
-    .replace(/^```json\n/, '')  // Remove opening ```json
-    .replace(/```$/, '')        // Remove closing ```
-    .replace(/^```\n/, '')      // Remove opening ``` without json
-    .trim();                    // Remove any extra whitespace
-}
-
-export async function generateMarketingContent(brandData: BrandFetchResponse): Promise<AIGeneratedContent> {
-  const description = brandData.longDescription || brandData.description || '';
+export async function generateMarketingContent(brandData: BrandFetchResponse): Promise<Partial<MarketingContent>> {
+  console.log('Generating content with API URL:', API_BASE_URL);
   
-  const prompt = `Generate marketing content for ${brandData.name} across multiple channels. 
-  Brand description: ${description}
-  
-  Generate concise, engaging content for each channel with appropriate lengths:
-  - SMS: Short, conversational message (max 160 chars)
-  - Push: Attention-grabbing title and brief message
-  - Card: Engaging title and short description
-  - In-app: Welcoming title, brief body text, and clear call-to-action
-  
-  Format the response as a JSON object with these fields:
-  {
-    "smsMessage": "string",
-    "pushTitle": "string",
-    "pushMessage": "string",
-    "cardTitle": "string",
-    "cardDescription": "string",
-    "inAppTitle": "string",
-    "inAppBody": "string",
-    "inAppCtaText": "string"
-  }`;
-
   try {
-    const response = await fetch(OPENAI_API_URL, {
+    const response = await fetch(`${API_BASE_URL}/generate-content`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a marketing copywriter specializing in creating concise, engaging content for various digital channels. Always format your responses as valid JSON.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      })
+        brand: brandData,
+        model: 'gpt-4o', // Using the specified model
+      }),
     });
 
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
-      throw new Error('Failed to generate content');
+      let errorMessage = 'Failed to generate content';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        // If parsing error response fails, use status text
+        errorMessage = `${errorMessage}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    const rawContent = data.choices[0].message.content;
-    console.log('Raw AI response:', rawContent); // For debugging
-    
-    const cleanedContent = cleanJsonResponse(rawContent);
-    console.log('Cleaned content:', cleanedContent); // For debugging
-    
-    const content = JSON.parse(cleanedContent);
-    return content as AIGeneratedContent;
+    console.log('Generated content:', data);
+
+    return {
+      smsMessage: data.smsMessage,
+      pushTitle: data.pushTitle,
+      pushMessage: data.pushMessage,
+      cardTitle: data.cardTitle,
+      cardDescription: data.cardDescription,
+      inAppTitle: data.inAppTitle,
+      inAppBody: data.inAppBody,
+      inAppCtaText: data.inAppCtaText,
+    };
   } catch (error) {
-    console.error('AI content generation error:', error);
-    if (error instanceof SyntaxError) {
-      console.error('JSON parsing failed. Raw content:', error);
-    }
+    console.error('Content generation error:', error);
     throw error;
   }
 } 

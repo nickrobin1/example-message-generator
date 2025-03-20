@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Video, User, MessageCircle, Search } from 'lucide-react';
+import { ChevronLeft, Video, User, MessageCircle, Search, Wand2, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import DeviceFrame from './components/DeviceFrame';
 import ChannelToggle from './components/ChannelToggle';
@@ -9,19 +9,20 @@ import CardEditor from './components/channels/CardEditor';
 import InAppEditor from './components/channels/InAppEditor';
 import InAppPreview from './components/channels/InAppPreview';
 import { getCurrentTime } from './utils/time';
-import type { MarketingContent } from './types';
+import { generateMarketingContent } from './utils/ai';
+import type { MarketingContent, BrandFetchResponse } from './types';
 
 // Use environment variable or fallback to local API URL
-const API_BASE_URL = import.meta.env.PROD 
-  ? '/api'  // This will be rewritten to /.netlify/functions by the redirect rule
-  : 'http://localhost:8888/.netlify/functions';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8888/.netlify/functions';
 
 function App() {
   const [activeChannel, setActiveChannel] = useState<string>('sms');
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const [content, setContent] = useState<MarketingContent>({
     brandName: 'Your Brand',
     logoUrl: '',
+    brandDescription: '',  // New field
     smsMessage: 'Welcome! Use code WELCOME20 for 20% off your first purchase.',
     pushTitle: 'Special Offer Inside! 🎉',
     pushMessage: 'Don\'t miss out on our latest collection. Tap to explore now!',
@@ -45,13 +46,46 @@ function App() {
     setContent(prev => ({ ...prev, [field]: value }));
   };
 
+  const showToast = (message: string, type: 'success' | 'error') => {
+    toast.custom(
+      (t) => (
+        <div
+          className={`${
+            t.visible ? 'animate-enter' : 'animate-leave'
+          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className={`text-sm font-medium ${
+                  type === 'error' ? 'text-red-600' : 'text-green-600'
+                }`}>
+                  {message}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-500 focus:outline-none"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: type === 'error' ? 10000 : 4000 }
+    );
+  };
+
   const handleBrandLookup = async (domain: string) => {
     console.log('Starting brand lookup for domain:', domain);
     console.log('Using API URL:', API_BASE_URL);
 
     if (!domain) {
       console.warn('No domain provided');
-      toast.error('Please enter a domain');
+      showToast('Please enter a domain', 'error');
       return;
     }
 
@@ -75,11 +109,18 @@ function App() {
       }
       
       console.log('Parsing response JSON...');
-      const data = await response.json();
+      const data: BrandFetchResponse = await response.json();
       console.log('Received brand data:', data);
       
       if (!data.name && !data.logo) {
-        toast.error('No brand information found. Please enter details manually.');
+        showToast('No brand information found. Please enter details manually.', 'error');
+        return;
+      }
+
+      // Get the best description available
+      const description = data.longDescription || data.description;
+      if (!description) {
+        showToast('No brand description found. Please enter details manually.', 'error');
         return;
       }
 
@@ -89,6 +130,7 @@ function App() {
           ...prev,
           brandName: data.name || prev.brandName,
           logoUrl: data.logo || prev.logoUrl,
+          brandDescription: description,
           // Update button colors if primary color is available
           ...(data.colors?.primary && {
             inAppCtaText: prev.inAppCtaText,
@@ -99,26 +141,56 @@ function App() {
         return newContent;
       });
 
-      // If we got a description, use it for the in-app message
-      if (data.description) {
-        console.log('Updating in-app body with description:', data.description);
-        setContent(prev => ({
-          ...prev,
-          inAppBody: data.description
-        }));
-      }
-
-      toast.success('Brand information updated successfully!');
+      showToast('Brand information updated successfully!', 'success');
     } catch (error) {
       console.error('Brand lookup error:', error);
       console.error('Full error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       });
-      toast.error('We were unable to lookup brand, please insert the brand info manually.');
+      showToast('We were unable to lookup brand, please insert the brand info manually.', 'error');
     } finally {
       console.log('Brand lookup completed');
       setLoading(false);
+    }
+  };
+
+  const handleGenerateContent = async () => {
+    if (!content.brandDescription) {
+      showToast('Please enter a brand description first', 'error');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      console.log('Starting content generation...');
+      const brandData: BrandFetchResponse = {
+        name: content.brandName,
+        domain: '',
+        logo: content.logoUrl,
+        description: content.brandDescription,
+        colors: {
+          primary: '',
+          all: []
+        }
+      };
+
+      console.log('Sending request with brand data:', brandData);
+      const generatedContent = await generateMarketingContent(brandData);
+      console.log('Received generated content:', generatedContent);
+      
+      setContent(prev => ({
+        ...prev,
+        ...generatedContent
+      }));
+
+      showToast('Marketing content generated successfully!', 'success');
+    } catch (error) {
+      console.error('AI content generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate content';
+      showToast(errorMessage, 'error');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -126,6 +198,10 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <Toaster 
         position="top-right"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
         toastOptions={{
           duration: 4000,
           style: {
@@ -136,11 +212,13 @@ function App() {
             style: {
               background: 'green',
             },
+            duration: 4000,
           },
           error: {
             style: {
               background: '#d63031',
             },
+            duration: 10000, // Give more time to read errors
           },
         }}
       />
@@ -204,6 +282,30 @@ function App() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="https://example.com/logo.png"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Brand Description</label>
+                <textarea
+                  value={content.brandDescription}
+                  onChange={(e) => handleInputChange('brandDescription', e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Enter brand description..."
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={handleGenerateContent}
+                  disabled={aiLoading || !content.brandDescription}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {aiLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : (
+                    <Wand2 className="w-5 h-5 mr-2" />
+                  )}
+                  Generate Content
+                </button>
               </div>
             </div>
           </div>
@@ -277,7 +379,7 @@ function App() {
                       </div>
                     )}
 
-                    {/* Brand Response */}
+                    {/* Brand Reply */}
                     {content.brandReply && (
                       <div className="flex justify-start">
                         <div className="bg-[#F2F2F7] text-black rounded-2xl px-4 py-2 max-w-[70%]">
@@ -287,95 +389,59 @@ function App() {
                     )}
                   </div>
                 </div>
-
-                {/* Message Input (Static) */}
-                <div className="border-t border-gray-200 p-3 flex items-center gap-2">
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-gray-400">
-                    iMessage
-                  </div>
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                    </svg>
-                  </div>
-                </div>
               </div>
             </DeviceFrame>
           )}
 
           {activeChannel === 'push' && (
-            <DeviceFrame title="Push Notification">
-              <div className="h-full relative bg-gradient-to-br from-pink-500 via-purple-500 to-teal-500">
-                {/* Lock Screen Time */}
-                <div className="absolute inset-0 flex flex-col items-center pt-14 text-white">
-                  <div className="text-6xl font-extralight tracking-tight">{getCurrentTime()}</div>
-                </div>
-
-                {/* Notification */}
-                <div className="absolute top-32 left-4 right-4">
-                  <div className="bg-[rgba(255,255,255,0.8)] backdrop-blur-xl rounded-2xl overflow-hidden">
-                    <div className="p-4 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                          {content.logoUrl ? (
-                            <img src={content.logoUrl} alt="Brand" className="w-full h-full rounded object-cover" />
-                          ) : (
-                            <span className="text-white text-xs">LOGO</span>
-                          )}
+            <DeviceFrame title="Push Notification Preview">
+              <div className="bg-white h-full flex flex-col">
+                {/* iOS Notification */}
+                <div className="p-4">
+                  <div className="bg-[#F2F2F7] rounded-2xl p-4">
+                    <div className="flex items-start space-x-3">
+                      {content.logoUrl ? (
+                        <img 
+                          src={content.logoUrl} 
+                          alt={content.brandName}
+                          className="w-12 h-12 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-gray-200 flex items-center justify-center">
+                          <User className="w-8 h-8 text-gray-400" />
                         </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center">
-                            <span className="font-semibold uppercase text-sm">{content.brandName}</span>
-                            <span className="text-xs text-gray-500">10m ago</span>
+                      )}
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-sm">{content.brandName}</h3>
+                            <p className="text-xs text-gray-500">{getCurrentTime()}</p>
                           </div>
                         </div>
+                        <h4 className="font-semibold mt-1">{content.pushTitle}</h4>
+                        <p className="text-sm mt-1">{content.pushMessage}</p>
                       </div>
-                      <div className="text-base font-semibold">{content.pushTitle}</div>
-                      <div className="text-sm text-gray-600">{content.pushMessage}</div>
                     </div>
                   </div>
                 </div>
-
-                {/* Bottom Controls */}
-                <div className="absolute bottom-8 inset-x-0">
-                  <div className="flex justify-between px-12">
-                    <div className="w-12 h-12 bg-[rgba(255,255,255,0.2)] rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.05 5A9 9 0 0023 12a9 9 0 00-7.95 7M8.95 5A9 9 0 001 12a9 9 0 007.95 7" />
-                      </svg>
-                    </div>
-                    <div className="w-12 h-12 bg-[rgba(255,255,255,0.2)] rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="mt-6 text-center">
-                    <span className="text-white/60 text-sm">swipe up to open</span>
-                  </div>
-                </div>
-
-                {/* Home Indicator */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-white rounded-full"></div>
               </div>
             </DeviceFrame>
           )}
 
           {activeChannel === 'card' && (
-            <DeviceFrame title="Content Card">
-              <div className="bg-gray-100 h-full p-4">
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <img src={content.cardImage} alt="Card" className="w-full h-48 object-cover" />
+            <DeviceFrame title="Card Preview">
+              <div className="bg-white h-full p-4">
+                <div className="bg-white rounded-lg overflow-hidden shadow">
+                  {content.cardImage && (
+                    <img 
+                      src={content.cardImage} 
+                      alt={content.cardTitle}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
                   <div className="p-4">
-                    <h3 className="font-semibold text-lg">{content.cardTitle}</h3>
-                    <p className="text-gray-600 mt-2 text-sm">{content.cardDescription}</p>
+                    <h3 className="text-lg font-semibold">{content.cardTitle}</h3>
+                    <p className="mt-2 text-gray-600">{content.cardDescription}</p>
                   </div>
                 </div>
               </div>
@@ -383,9 +449,7 @@ function App() {
           )}
 
           {activeChannel === 'in-app' && (
-            <DeviceFrame title="In-App Message">
-              <InAppPreview content={content} />
-            </DeviceFrame>
+            <InAppPreview content={content} />
           )}
         </div>
       </div>

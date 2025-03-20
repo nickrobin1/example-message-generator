@@ -28,12 +28,9 @@ export interface BrandFetchResponse {
   logo: string;
   description?: string;
   longDescription?: string;
-  colors: {
+  colors?: {
     primary: string;
-    all: Array<{
-      hex: string;
-      type: string;
-    }>;
+    all: string[];
   };
 }
 
