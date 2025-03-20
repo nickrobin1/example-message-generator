@@ -81,11 +81,28 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  // Simple domain extraction - just get the base domain
-  const sanitizedDomain = domain
-    .replace(/^https?:\/\//, '') // Remove protocol
-    .replace(/^www\./, '')       // Remove www
-    .split('/')[0];              // Remove any paths
+  // Extract the domain properly using URL parsing
+  let sanitizedDomain;
+  try {
+    // If it looks like a URL, parse it properly
+    if (domain.includes('://') || domain.includes('.')) {
+      // Ensure we have a protocol for URL parsing
+      const urlToParse = domain.includes('://') ? domain : `https://${domain}`;
+      const parsedUrl = new URL(urlToParse);
+      // Get hostname and remove www. if present
+      sanitizedDomain = parsedUrl.hostname.replace(/^www\./, '');
+    } else {
+      // If it doesn't look like a URL, just use as is
+      sanitizedDomain = domain;
+    }
+  } catch (error) {
+    // If URL parsing fails, fallback to regex-based approach
+    console.error('URL parsing failed, using fallback:', error);
+    sanitizedDomain = domain
+      .replace(/^https?:\/\//, '') // Remove protocol
+      .replace(/^www\./, '')       // Remove www
+      .split('/')[0];              // Remove any paths
+  }
 
   console.log('Sanitized domain:', sanitizedDomain);
 
