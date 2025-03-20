@@ -12,8 +12,10 @@ import { getCurrentTime } from './utils/time';
 import { generateMarketingContent } from './utils/ai';
 import type { MarketingContent, BrandFetchResponse } from './types';
 
-// Use environment variable or fallback to local API URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8888/.netlify/functions';
+// Use current origin in production, fallback to localhost for development
+const API_BASE_URL = import.meta.env.PROD 
+  ? window.location.origin
+  : 'http://localhost:8888';
 
 function App() {
   const [activeChannel, setActiveChannel] = useState<string>('sms');
@@ -90,7 +92,7 @@ function App() {
     }
 
     setLoading(true);
-    const requestUrl = `${API_BASE_URL}/brand-lookup/${encodeURIComponent(domain)}`;
+    const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(domain)}`;
     console.log('Making request to:', requestUrl);
 
     try {
