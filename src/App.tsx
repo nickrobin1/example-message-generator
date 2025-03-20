@@ -11,6 +11,13 @@ import InAppPreview from './components/channels/InAppPreview';
 import { getCurrentTime } from './utils/time';
 import { generateMarketingContent } from './utils/ai';
 import type { MarketingContent, BrandFetchResponse } from './types';
+import wallpaperImage from './assets/iOS wallpaper.png';
+import flashlightIcon from './assets/Flashlight button.svg';
+import cameraIcon from './assets/Camera button.svg';
+import lockIcon from './assets/lock.svg';
+import timeIcon from './assets/Time.svg';
+import ImageCropModal from './components/ImageCropModal';
+import { brandSeeds } from './data/brandSeeds';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -24,7 +31,7 @@ function App() {
   const [content, setContent] = useState<MarketingContent>({
     brandName: 'Your Brand',
     logoUrl: '',
-    brandDescription: '',  // New field
+    brandDescription: '',
     smsMessage: 'Welcome! Use code WELCOME20 for 20% off your first purchase.',
     pushTitle: 'Special Offer Inside! 🎉',
     pushMessage: 'Don\'t miss out on our latest collection. Tap to explore now!',
@@ -41,8 +48,16 @@ function App() {
     inAppSurveyOptions: ['', '', '', ''],
     inAppSelectedOptions: [],
     inAppSurveyType: 'single',
-    inAppBackgroundImage: ''
+    inAppBackgroundImage: '',
+    smsIcon: '',
+    pushIcon: '',
+    inAppInputLabel: 'Email Address',
+    inAppInputPlaceholder: 'Enter your email to get updates',
+    inAppSubmitButtonText: 'Sign Up'
   });
+
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [tempLogo, setTempLogo] = useState('');
 
   const handleInputChange = (field: keyof MarketingContent, value: string | string[]) => {
     setContent(prev => ({ ...prev, [field]: value }));
@@ -112,6 +127,28 @@ function App() {
       return;
     }
 
+    // Check if this is a test domain
+    if (domain in brandSeeds) {
+      console.log('Using seed data for test domain:', domain);
+      const seedData = brandSeeds[domain as keyof typeof brandSeeds];
+      
+      setContent(prev => {
+        const newContent = {
+          ...prev,
+          brandName: seedData.name,
+          logoUrl: seedData.logo,
+          brandDescription: seedData.longDescription,
+        };
+        console.log('New content state:', newContent);
+        return newContent;
+      });
+
+      setTempLogo(seedData.logo);
+      setShowCropModal(true);
+      showToast('Brand information updated successfully!', 'success');
+      return;
+    }
+
     // Sanitize the domain before making the API call
     const sanitizedDomain = sanitizeDomain(domain);
     console.log('Sanitized domain:', sanitizedDomain);
@@ -168,6 +205,9 @@ function App() {
         return newContent;
       });
 
+      setTempLogo(data.logo);
+      setShowCropModal(true);
+
       showToast('Brand information updated successfully!', 'success');
     } catch (error) {
       console.error('Brand lookup error:', error);
@@ -180,6 +220,16 @@ function App() {
       console.log('Brand lookup completed');
       setLoading(false);
     }
+  };
+
+  const handleCropComplete = (smsIcon: string, pushIcon: string) => {
+    setContent({
+      ...content,
+      logoUrl: tempLogo,
+      smsIcon,
+      pushIcon,
+    });
+    setShowCropModal(false);
   };
 
   const handleGenerateContent = async () => {
@@ -223,7 +273,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F8F7FF]">
       <Toaster 
         position="top-right"
         reverseOrder={false}
@@ -246,29 +296,38 @@ function App() {
             style: {
               background: '#d63031',
             },
-            duration: 10000, // Give more time to read errors
+            duration: 10000,
           },
         }}
       />
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-900">Braze Preview Generator</h1>
+      <header className="bg-[#3D1D72] px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <img 
+              src="/src/assets/Braze Logo Icon.png" 
+              alt="Braze" 
+              className="w-8 h-8 mr-3"
+            />
+            <h1 className="text-2xl font-bold text-white">Preview Generator</h1>
+          </div>
+        </div>
       </header>
 
       <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Brand Settings</h2>
-            <div className="space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h2 className="text-xl font-semibold mb-6 text-[#3D1D72]">Brand Assets</h2>
+            <div className="space-y-5">
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700">Domain</label>
-                  <div className="mt-1 flex rounded-md shadow-sm">
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Domain</label>
+                  <div className="flex rounded-lg shadow-sm">
                     <input
                       type="text"
                       placeholder="example.com"
-                      className="flex-1 rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="flex-1 rounded-l-lg border-gray-200 focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           handleBrandLookup((e.target as HTMLInputElement).value);
@@ -281,7 +340,7 @@ function App() {
                         if (input) handleBrandLookup(input.value);
                       }}
                       disabled={loading}
-                      className="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-700 hover:bg-gray-100"
+                      className="inline-flex items-center px-4 py-2 border border-l-0 border-gray-200 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100"
                     >
                       {loading ? (
                         <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
@@ -293,30 +352,30 @@ function App() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Brand Name</label>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
                 <input
                   type="text"
                   value={content.brandName}
                   onChange={(e) => handleInputChange('brandName', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Logo URL</label>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Logo URL</label>
                 <input
                   type="text"
                   value={content.logoUrl}
                   onChange={(e) => handleInputChange('logoUrl', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
                   placeholder="https://example.com/logo.png"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Brand Description</label>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Brand Description</label>
                 <textarea
                   value={content.brandDescription}
                   onChange={(e) => handleInputChange('brandDescription', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
                   rows={3}
                   placeholder="Enter brand description..."
                 />
@@ -325,7 +384,7 @@ function App() {
                 <button
                   onClick={handleGenerateContent}
                   disabled={aiLoading || !content.brandDescription}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#3D1D72] hover:bg-[#2D1655] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {aiLoading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
@@ -423,34 +482,73 @@ function App() {
 
           {activeChannel === 'push' && (
             <DeviceFrame title="Push Notification Preview">
-              <div className="bg-white h-full flex flex-col">
+              <div className="relative h-full">
+                {/* Wallpaper Background */}
+                <img 
+                  src={wallpaperImage} 
+                  alt="iOS Wallpaper" 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+
+                {/* Lock Icon */}
+                <img
+                  src={lockIcon}
+                  alt="Lock"
+                  className="absolute top-12 left-1/2 transform -translate-x-1/2 w-4 h-4"
+                />
+
+                {/* Time */}
+                <div className="absolute inset-x-0 top-20 text-center text-white">
+                  <img
+                    src={timeIcon}
+                    alt="9:41"
+                    className="w-[72px] mx-auto"
+                  />
+                  <div className="text-[22px] font-normal mt-1 font-['SF_Pro_Display']">Monday, June 3</div>
+                </div>
+
                 {/* iOS Notification */}
-                <div className="p-4">
-                  <div className="bg-[#F2F2F7] rounded-2xl p-4">
-                    <div className="flex items-start space-x-3">
-                      {content.logoUrl ? (
-                        <img 
-                          src={content.logoUrl} 
-                          alt={content.brandName}
-                          className="w-12 h-12 rounded-xl object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-gray-200 flex items-center justify-center">
-                          <User className="w-8 h-8 text-gray-400" />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-semibold text-sm">{content.brandName}</h3>
-                            <p className="text-xs text-gray-500">{getCurrentTime()}</p>
+                <div className="absolute inset-x-4 top-[180px]">
+                  <div 
+                    className="w-full h-[55.36px] rounded-[9px] p-[7.18px] space-y-[7.18px] font-['SF_Pro_Text']"
+                    style={{ 
+                      background: 'rgba(245, 245, 245, 0.3)',
+                      backdropFilter: 'blur(25px)',
+                      WebkitBackdropFilter: 'blur(25px)',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-[7.18px]">
+                        {content.logoUrl ? (
+                          <img 
+                            src={content.logoUrl} 
+                            alt={content.brandName}
+                            className="w-[32px] h-[32px] rounded-[6px] object-cover"
+                          />
+                        ) : (
+                          <div className="w-[32px] h-[32px] rounded-[6px] bg-blue-600 flex items-center justify-center">
+                            <User className="w-5 h-5 text-white" />
                           </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className="text-[13px] font-semibold leading-none font-['SF_Pro_Text']">{content.brandName}</span>
+                          <span className="text-[11px] text-[#86868B] mt-0.5 font-['SF_Pro_Text']">{content.pushTitle}</span>
                         </div>
-                        <h4 className="font-semibold mt-1">{content.pushTitle}</h4>
-                        <p className="text-sm mt-1">{content.pushMessage}</p>
                       </div>
+                      <span className="text-[11px] text-[#86868B] font-['SF_Pro_Text']">34m ago</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Bottom Swipe Indicator */}
+                <div className="absolute inset-x-0 bottom-6 flex flex-col items-center space-y-2">
+                  <div className="flex justify-between w-48">
+                    <img src={flashlightIcon} alt="Flashlight" className="w-6 h-6" />
+                    <img src={cameraIcon} alt="Camera" className="w-6 h-6" />
+                  </div>
+                  <div className="text-white/60 text-sm font-['SF_Pro_Text']">swipe up to open</div>
+                  <div className="w-32 h-1 bg-white rounded-full mt-2" />
                 </div>
               </div>
             </DeviceFrame>
@@ -485,12 +583,22 @@ function App() {
       {/* Feedback Button */}
       <div className="fixed bottom-4 right-4">
         <a
-          href="mailto:nick.robin@braze.com"
-          className="flex items-center gap-2 bg-blue-500 text-white px-3 py-2 rounded-full hover:bg-blue-600 transition-colors"
+          href="https://mail.google.com/mail/?view=cm&fs=1&to=nick.robin@braze.com&su=Message%20Preview%20Tool%20Feedback"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 bg-[#3D1D72] text-white px-3 py-2 rounded-full hover:bg-[#2D1655] transition-colors"
         >
           <MessageCircle className="w-4 h-4" />
         </a>
       </div>
+
+      {showCropModal && (
+        <ImageCropModal
+          imageUrl={tempLogo}
+          onClose={() => setShowCropModal(false)}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 }

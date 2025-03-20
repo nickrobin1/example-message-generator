@@ -1,4 +1,4 @@
-export interface MarketingContent {
+export type MarketingContent = {
   brandName: string;
   logoUrl: string;
   brandDescription: string;
@@ -10,17 +10,21 @@ export interface MarketingContent {
   cardImage: string;
   userReply: string;
   brandReply: string;
-  // In-app message fields
-  inAppType: 'modal-logo' | 'modal-image' | 'fullscreen' | 'survey';
+  inAppType: string;
   inAppTitle: string;
   inAppBody: string;
   inAppImage: string;
   inAppCtaText: string;
   inAppSurveyOptions: string[];
   inAppSelectedOptions: string[];
-  inAppSurveyType: 'single' | 'multiple';
+  inAppSurveyType: string;
   inAppBackgroundImage: string;
-}
+  smsIcon: string;
+  pushIcon: string;
+  inAppInputLabel?: string;
+  inAppInputPlaceholder?: string;
+  inAppSubmitButtonText?: string;
+};
 
 export interface BrandFetchResponse {
   name: string;
@@ -30,7 +34,7 @@ export interface BrandFetchResponse {
   longDescription?: string;
   colors?: {
     primary: string;
-    all: string[];
+    all: Array<{ hex: string; type: string; brightness: number }>;
   };
 }
 
