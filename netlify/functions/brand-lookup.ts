@@ -81,9 +81,17 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  // Sanitize the domain by removing protocol and path
+  const sanitizedDomain = domain
+    .replace(/^(https?:\/\/)?(www\.)?/, '') // Remove protocol and www
+    .split('/')[0] // Remove any paths
+    .toLowerCase(); // Convert to lowercase
+
+  console.log('Sanitized domain:', sanitizedDomain);
+
   try {
     console.log('Making request to Brandfetch API...');
-    const response = await axios.get(`https://api.brandfetch.io/v2/brands/${domain}`, {
+    const response = await axios.get(`https://api.brandfetch.io/v2/brands/${sanitizedDomain}`, {
       headers: {
         'Authorization': `Bearer ${process.env.BRANDFETCH_API_KEY}`
       }
