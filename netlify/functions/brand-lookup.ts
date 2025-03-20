@@ -71,7 +71,8 @@ export const handler: Handler = async (event) => {
   }
 
   const domain = event.path.split('/').pop();
-  console.log('Extracted domain:', domain);
+  console.log('Raw input from event.path:', event.path);
+  console.log('After pop():', domain);
   
   if (!domain) {
     console.log('No domain provided');
@@ -86,25 +87,30 @@ export const handler: Handler = async (event) => {
   try {
     // If it looks like a URL, parse it properly
     if (domain.includes('://') || domain.includes('.')) {
+      console.log('Input looks like a URL, attempting to parse...');
       // Ensure we have a protocol for URL parsing
       const urlToParse = domain.includes('://') ? domain : `https://${domain}`;
+      console.log('URL to parse:', urlToParse);
       const parsedUrl = new URL(urlToParse);
+      console.log('Parsed URL hostname:', parsedUrl.hostname);
       // Get hostname and remove www. if present
       sanitizedDomain = parsedUrl.hostname.replace(/^www\./, '');
+      console.log('After www removal:', sanitizedDomain);
     } else {
-      // If it doesn't look like a URL, just use as is
+      console.log('Input does not look like a URL, using as is:', domain);
       sanitizedDomain = domain;
     }
   } catch (error) {
     // If URL parsing fails, fallback to regex-based approach
-    console.error('URL parsing failed, using fallback:', error);
+    console.error('URL parsing failed, using fallback. Error:', error);
     sanitizedDomain = domain
       .replace(/^https?:\/\//, '') // Remove protocol
       .replace(/^www\./, '')       // Remove www
       .split('/')[0];              // Remove any paths
+    console.log('After fallback processing:', sanitizedDomain);
   }
 
-  console.log('Sanitized domain:', sanitizedDomain);
+  console.log('Final sanitized domain:', sanitizedDomain);
 
   try {
     console.log('Making request to Brandfetch API...');
