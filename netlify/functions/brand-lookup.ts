@@ -109,7 +109,8 @@ export const handler: Handler = async (event) => {
           type: c.type
         })) || []
       },
-      description: data.description || ''
+      description: data.description || '',
+      longDescription: data.longDescription || data.description || ''
     };
 
     console.log('Processed brand data:', brandData);
