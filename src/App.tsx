@@ -18,6 +18,7 @@ import lockIcon from './assets/lock.svg';
 import timeIcon from './assets/Time.svg';
 import ImageCropModal from './components/ImageCropModal';
 import { brandSeeds } from './data/brandSeeds';
+import FakeBrandAutocomplete from './components/FakeBrandAutocomplete';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -353,11 +354,17 @@ function App() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
-                <input
-                  type="text"
+                <FakeBrandAutocomplete
                   value={content.brandName}
-                  onChange={(e) => handleInputChange('brandName', e.target.value)}
-                  className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
+                  onChange={(value) => handleInputChange('brandName', value)}
+                  onSelectBrand={(brand) => {
+                    setContent(prev => ({
+                      ...prev,
+                      brandName: brand.name,
+                      logoUrl: `/src/assets/Fake Brands/${brand.image}`,
+                      brandDescription: brand.description
+                    }));
+                  }}
                 />
               </div>
               <div>
