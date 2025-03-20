@@ -9,7 +9,7 @@ export async function generateMarketingContent(brandData: BrandFetchResponse): P
   console.log('Generating content with API URL:', API_BASE_URL);
   console.log('Request payload:', {
     brand: brandData,
-    model: 'gpt-4'
+    model: 'gpt-4o'
   });
   
   try {
@@ -20,7 +20,7 @@ export async function generateMarketingContent(brandData: BrandFetchResponse): P
       },
       body: JSON.stringify({
         brand: brandData,
-        model: 'gpt-4', // Fixed model name
+        model: 'gpt-4o', // Using the correct model name
       }),
     });
 

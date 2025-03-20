@@ -67,8 +67,11 @@ export const handler: Handler = async (event) => {
       throw new Error('Brand description is required');
     }
 
+    // Use long description if available, otherwise fall back to regular description
+    const brandDescription = brand.longDescription || brand.description;
+
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
@@ -86,7 +89,7 @@ export const handler: Handler = async (event) => {
         },
         {
           role: 'user',
-          content: `Generate marketing content for ${brand.name || 'this brand'}. Use this description: ${brand.description}`
+          content: `Generate marketing content for ${brand.name || 'this brand'}. Use this description: ${brandDescription}`
         }
       ],
       temperature: 0.7,
