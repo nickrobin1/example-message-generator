@@ -88,13 +88,13 @@ export const fakeBrands: FakeBrand[] = [
     name: "Siege Valley Health",
     description: "Largest healthcare provider in the quad-state area, operating hospitals, research centers, outpatient facilities, and urgent care clinics.",
     category: "Health App",
-    image: "FakeBrandz_SiegeValleyHealth_AppIcon.png.png"
+    image: "FakeBrandz_SiegeValleyHealth_AppIcon.png"
   },
   {
     name: "ClaimsJumpr",
     description: "Disruptive insurance startup covering home, auto, life, and pet insurance with an advanced fraud detection algorithm.",
     category: "Insurance App",
-    image: "FakeBrandz_ClaimsJumpr_AppIcon.png.png"
+    image: "FakeBrandz_ClaimsJumpr_AppIcon.png"
   },
   {
     name: "CashBlastr",

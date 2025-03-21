@@ -18,8 +18,9 @@ export default function PushPreview({ content }: { content: MarketingContent }) 
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <div className="font-medium text-gray-900">{content.pushTitle || 'Push Title'}</div>
-            <p className="text-gray-600 mt-1">{content.pushMessage || 'Your message will appear here'}</p>
+            <div className="font-medium text-black">{content.pushTitle || 'Push Title'}</div>
+            <p className="text-black mt-1">{content.pushMessage || 'Your message will appear here'}</p>
+            <div className="text-black text-sm mt-1">34m ago</div>
           </div>
         </div>
       </div>

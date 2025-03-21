@@ -16,6 +16,7 @@ import flashlightIcon from './assets/Flashlight button.svg';
 import cameraIcon from './assets/Camera button.svg';
 import lockIcon from './assets/lock.svg';
 import timeIcon from './assets/Time.svg';
+import brazeLogoIcon from './assets/Braze Logo Icon.png';
 import { brandSeeds } from './data/brandSeeds';
 import FakeBrandAutocomplete from './components/FakeBrandAutocomplete';
 import SMSPreview from './components/channels/SMSPreview';
@@ -247,7 +248,7 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center">
             <img 
-              src="/src/assets/Braze Logo Icon.png" 
+              src={brazeLogoIcon} 
               alt="Braze" 
               className="w-8 h-8 mr-3"
             />
@@ -424,10 +425,10 @@ function App() {
                         )}
                         <div className="flex flex-col">
                           <span className="text-[13px] font-semibold leading-none font-['SF_Pro_Text']">{content.brandName}</span>
-                          <span className="text-[11px] text-[#86868B] mt-0.5 font-['SF_Pro_Text']">{content.pushTitle}</span>
+                          <span className="text-[11px] text-black mt-0.5 font-['SF_Pro_Text']">{content.pushTitle}</span>
                         </div>
                       </div>
-                      <span className="text-[11px] text-[#86868B] font-['SF_Pro_Text']">34m ago</span>
+                      <span className="text-[11px] text-black font-['SF_Pro_Text']">34m ago</span>
                     </div>
                   </div>
                 </div>
@@ -481,12 +482,13 @@ function App() {
       {/* Feedback Button */}
       <div className="fixed bottom-4 right-4">
         <a
-          href="https://mail.google.com/mail/?view=cm&fs=1&to=nick.robin@braze.com&su=Message%20Preview%20Tool%20Feedback"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSdrw8jpZMNFU3GMj_u3gnSTh5cDtLmWmlI5fHi-eZMDLDV5DQ/viewform"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 bg-[#3D1D72] text-white px-3 py-2 rounded-full hover:bg-[#2D1655] transition-colors"
+          className="flex items-center gap-2 bg-[#3D1D72] text-white px-4 py-2 rounded-full hover:bg-[#2D1655] transition-colors"
         >
           <MessageCircle className="w-4 h-4" />
+          <span>Share Feedback</span>
         </a>
       </div>
     </div>
