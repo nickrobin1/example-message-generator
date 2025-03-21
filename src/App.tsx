@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Video, User, MessageCircle, Search, Wand2, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import DeviceFrame from './components/DeviceFrame';
@@ -8,6 +8,7 @@ import PushEditor from './components/channels/PushEditor';
 import CardEditor from './components/channels/CardEditor';
 import InAppEditor from './components/channels/InAppEditor';
 import InAppPreview from './components/channels/InAppPreview';
+import WelcomeModal from './components/WelcomeModal';
 import { getCurrentTime } from './utils/time';
 import { generateMarketingContent } from './utils/ai';
 import type { MarketingContent, BrandFetchResponse } from './types';
@@ -30,6 +31,7 @@ function App() {
   const [activeChannel, setActiveChannel] = useState<string>('sms');
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [content, setContent] = useState<MarketingContent>({
     brandName: 'Your Brand',
     logoUrl: '',
@@ -57,6 +59,14 @@ function App() {
     inAppInputPlaceholder: 'Enter your email to get updates',
     inAppSubmitButtonText: 'Sign Up'
   });
+
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true);
+      localStorage.setItem('hasSeenWelcome', 'true');
+    }
+  }, []);
 
   const handleInputChange = (field: keyof MarketingContent, value: string | string[]) => {
     setContent(prev => ({ ...prev, [field]: value }));
@@ -217,6 +227,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#F8F7FF]">
+      {showWelcomeModal && (
+        <WelcomeModal onClose={() => setShowWelcomeModal(false)} />
+      )}
       <Toaster 
         position="top-right"
         reverseOrder={false}
