@@ -20,23 +20,6 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
     }
   };
 
-  const handleOptionSelect = (option: string) => {
-    // Don't allow selecting empty options
-    if (!option.trim()) return;
-
-    if (content.inAppSurveyType === 'single') {
-      // For single selection, either select the option or deselect if it's already selected
-      const newSelected = content.inAppSelectedOptions[0] === option ? [] : [option];
-      onContentChange('inAppSelectedOptions', newSelected);
-    } else {
-      // For multiple selection, toggle the option
-      const newSelected = content.inAppSelectedOptions.includes(option)
-        ? content.inAppSelectedOptions.filter(o => o !== option)
-        : [...content.inAppSelectedOptions, option];
-      onContentChange('inAppSelectedOptions', newSelected);
-    }
-  };
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -72,6 +55,7 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
             <option value="modal-image">Modal with Image</option>
             <option value="fullscreen">Full Screen</option>
             <option value="survey">Simple Survey</option>
+            <option value="information-capture">Information Capture</option>
           </select>
         </div>
 
@@ -113,19 +97,18 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
 
         {content.inAppType === 'survey' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700">Survey Type</label>
-            <select
-              value={content.inAppSurveyType}
-              onChange={(e) => {
-                onContentChange('inAppSurveyType', e.target.value as 'single' | 'multiple');
-                // Clear selections when changing survey type
-                onContentChange('inAppSelectedOptions', []);
-              }}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="single">Single Selection</option>
-              <option value="multiple">Multiple Selection</option>
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Survey Options</label>
+            {content.inAppSurveyOptions.map((option, index) => (
+              <div key={index} className="mb-2">
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => handleSurveyOptionChange(index, e.target.value)}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={`Option ${index + 1}`}
+                />
+              </div>
+            ))}
           </div>
         )}
 
@@ -164,35 +147,29 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
           </div>
         )}
 
-        {content.inAppType === 'survey' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Survey Options</label>
-            {content.inAppSurveyOptions.map((option, index) => (
-              <div key={index} className="mb-2 flex gap-2">
-                <input
-                  type="text"
-                  value={option}
-                  onChange={(e) => handleSurveyOptionChange(index, e.target.value)}
-                  className="block flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={`Option ${index + 1}`}
-                />
-                <button
-                  type="button"
-                  disabled={!option.trim()}
-                  onClick={() => handleOptionSelect(option)}
-                  className={`px-3 py-2 rounded ${
-                    !option.trim()
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : content.inAppSelectedOptions.includes(option)
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  Select
-                </button>
-              </div>
-            ))}
-          </div>
+        {content.inAppType === 'information-capture' && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Input Field Label</label>
+              <input
+                type="text"
+                value={content.inAppInputLabel || ''}
+                onChange={(e) => onContentChange('inAppInputLabel', e.target.value)}
+                placeholder="e.g., Email Address"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Input Field Placeholder</label>
+              <input
+                type="text"
+                value={content.inAppInputPlaceholder || ''}
+                onChange={(e) => onContentChange('inAppInputPlaceholder', e.target.value)}
+                placeholder="e.g., Enter your email to get updates"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </>
         )}
 
         <div>

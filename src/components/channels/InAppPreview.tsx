@@ -5,9 +5,10 @@ import { MarketingContent } from '../../types';
 
 interface InAppPreviewProps {
   content: MarketingContent;
+  onContentChange: (field: keyof MarketingContent, value: string | string[]) => void;
 }
 
-const InAppPreview: React.FC<InAppPreviewProps> = ({ content }) => {
+const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange }) => {
   const [primaryColor, setPrimaryColor] = useState<string>('#7C3AED'); // Default purple
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content }) => {
       case 'modal-logo':
         return (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md relative">
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative">
               <button className="absolute right-4 top-4">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
@@ -48,17 +49,17 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content }) => {
                   <img 
                     src={content.logoUrl} 
                     alt={content.brandName} 
-                    className="w-32 h-16 mx-auto mb-6 object-contain"
+                    className="w-24 h-12 mx-auto mb-4 object-contain"
                   />
                 ) : (
-                  <div className="w-32 h-16 mx-auto mb-6 bg-purple-100 flex items-center justify-center rounded">
-                    <span className="text-xl font-bold text-purple-600">LOGO</span>
+                  <div className="w-24 h-12 mx-auto mb-4 bg-purple-100 flex items-center justify-center rounded">
+                    <span className="text-lg font-bold text-purple-600">LOGO</span>
                   </div>
                 )}
-                <h2 className="text-xl font-semibold text-center mb-3">{content.inAppTitle}</h2>
-                <p className="text-gray-600 text-center mb-6">{content.inAppBody}</p>
+                <h2 className="text-lg font-semibold text-center mb-2">{content.inAppTitle}</h2>
+                <p className="text-gray-600 text-center text-sm mb-4">{content.inAppBody}</p>
                 <button 
-                  className="w-full text-white py-3 rounded-lg font-medium transition-colors"
+                  className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {content.inAppCtaText || 'Continue'}
@@ -71,20 +72,20 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content }) => {
       case 'modal-image':
         return (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md relative overflow-hidden">
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative overflow-hidden">
               <button className="absolute right-4 top-4 z-10">
                 <X className="w-6 h-6 text-white" />
               </button>
               <img
                 src={content.inAppImage || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04'}
                 alt="Preview"
-                className="w-full h-48 object-cover"
+                className="w-full h-36 object-cover"
               />
               <div className="p-6">
-                <h2 className="text-xl font-semibold mb-3">{content.inAppTitle}</h2>
-                <p className="text-gray-600 mb-6">{content.inAppBody}</p>
+                <h2 className="text-lg font-semibold mb-2">{content.inAppTitle}</h2>
+                <p className="text-gray-600 text-sm mb-4">{content.inAppBody}</p>
                 <button 
-                  className="w-full text-white py-3 rounded-lg font-medium transition-colors"
+                  className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {content.inAppCtaText || 'Continue'}
@@ -97,29 +98,26 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content }) => {
       case 'fullscreen':
         return (
           <div className="absolute inset-0 bg-white">
-            <div className="relative h-full">
+            <div className="relative h-full flex flex-col">
               <button className="absolute right-4 top-4 z-10">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
-              <img
-                src={content.inAppImage || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04'}
-                alt="Preview"
-                className="w-full h-1/2 object-cover"
-              />
-              <div className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">{content.inAppTitle}</h2>
-                <p className="text-gray-600 mb-8">{content.inAppBody}</p>
-                <div className="flex gap-4">
-                  <button 
-                    className="flex-1 text-white py-3 rounded-lg font-medium transition-colors"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    {content.inAppCtaText || 'Continue'}
-                  </button>
-                  <button className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium">
-                    No Thanks
-                  </button>
-                </div>
+              {content.inAppImage && (
+                <img
+                  src={content.inAppImage}
+                  alt="Preview"
+                  className="w-full h-48 object-cover"
+                />
+              )}
+              <div className="p-6 flex-1 flex flex-col">
+                <h2 className="text-lg font-semibold mb-2">{content.inAppTitle}</h2>
+                <p className="text-gray-600 text-sm mb-4 flex-1">{content.inAppBody}</p>
+                <button 
+                  className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {content.inAppCtaText || 'Continue'}
+                </button>
               </div>
             </div>
           </div>
@@ -128,38 +126,73 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content }) => {
       case 'survey':
         return (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md relative">
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative">
               <button className="absolute right-4 top-4">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
               <div className="p-6">
-                <h2 className="text-xl font-semibold mb-3">{content.inAppTitle}</h2>
-                <p className="text-gray-600 mb-6">{content.inAppBody}</p>
-                <div className="space-y-3 mb-6">
-                  {content.inAppSurveyOptions.map((option, index) => (
+                <h2 className="text-lg font-semibold mb-2">{content.inAppTitle}</h2>
+                <p className="text-gray-600 text-sm mb-4">{content.inAppBody}</p>
+                <div className="space-y-2 mb-4">
+                  {content.inAppSurveyOptions.map((option, index) => option && (
                     <button
                       key={index}
-                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
-                        content.inAppSelectedOptions.includes(option)
-                          ? 'border-current bg-opacity-10'
-                          : 'border-gray-300'
-                      }`}
-                      style={content.inAppSelectedOptions.includes(option) ? {
-                        borderColor: primaryColor,
-                        backgroundColor: `${primaryColor}10`,
-                        color: primaryColor
-                      } : undefined}
+                      className="w-full text-left px-3 py-2 text-sm rounded-lg border border-gray-300 hover:border-gray-400"
                     >
-                      {option || `Option ${index + 1}`}
+                      {option}
                     </button>
                   ))}
                 </div>
                 <button 
-                  className="w-full text-white py-3 rounded-lg font-medium transition-colors"
+                  className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {content.inAppCtaText || 'Submit'}
                 </button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'information-capture':
+        return (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative">
+              <button className="absolute right-4 top-4">
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+              <div className="p-6">
+                {content.logoUrl ? (
+                  <img 
+                    src={content.logoUrl} 
+                    alt={content.brandName} 
+                    className="w-24 h-12 mx-auto mb-4 object-contain"
+                  />
+                ) : (
+                  <div className="w-24 h-12 mx-auto mb-4 bg-purple-100 flex items-center justify-center rounded">
+                    <span className="text-lg font-bold text-purple-600">LOGO</span>
+                  </div>
+                )}
+                <h2 className="text-lg font-semibold text-center mb-2">{content.inAppTitle}</h2>
+                <p className="text-gray-600 text-center text-sm mb-4">{content.inAppBody}</p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {content.inAppInputLabel || 'Email Address'}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={content.inAppInputPlaceholder || 'Enter your email to get updates'}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <button 
+                    className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    {content.inAppCtaText || 'Submit'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

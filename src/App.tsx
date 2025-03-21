@@ -16,9 +16,9 @@ import flashlightIcon from './assets/Flashlight button.svg';
 import cameraIcon from './assets/Camera button.svg';
 import lockIcon from './assets/lock.svg';
 import timeIcon from './assets/Time.svg';
-import ImageCropModal from './components/ImageCropModal';
 import { brandSeeds } from './data/brandSeeds';
 import FakeBrandAutocomplete from './components/FakeBrandAutocomplete';
+import SMSPreview from './components/channels/SMSPreview';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -57,11 +57,29 @@ function App() {
     inAppSubmitButtonText: 'Sign Up'
   });
 
-  const [showCropModal, setShowCropModal] = useState(false);
-  const [tempLogo, setTempLogo] = useState('');
-
   const handleInputChange = (field: keyof MarketingContent, value: string | string[]) => {
     setContent(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Function to sanitize domain before API call
+  const sanitizeDomain = (url: string): string => {
+    try {
+      // If it looks like a URL, parse it properly
+      if (url.includes('://') || url.includes('.')) {
+        // Ensure we have a protocol for URL parsing
+        const urlToParse = url.includes('://') ? url : `https://${url}`;
+        const parsedUrl = new URL(urlToParse);
+        // Get hostname and remove www. if present
+        return parsedUrl.hostname.replace(/^www\./, '');
+      }
+      return url;
+    } catch (error) {
+      // If URL parsing fails, fallback to regex-based approach
+      return url
+        .replace(/^https?:\/\//, '') // Remove protocol
+        .replace(/^www\./, '')       // Remove www
+        .split('/')[0];              // Remove any paths
+    }
   };
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -97,140 +115,63 @@ function App() {
     );
   };
 
-  // Function to sanitize domain before API call
-  const sanitizeDomain = (url: string): string => {
-    try {
-      // If it looks like a URL, parse it properly
-      if (url.includes('://') || url.includes('.')) {
-        // Ensure we have a protocol for URL parsing
-        const urlToParse = url.includes('://') ? url : `https://${url}`;
-        const parsedUrl = new URL(urlToParse);
-        // Get hostname and remove www. if present
-        return parsedUrl.hostname.replace(/^www\./, '');
-      }
-      return url;
-    } catch (error) {
-      // If URL parsing fails, fallback to regex-based approach
-      return url
-        .replace(/^https?:\/\//, '') // Remove protocol
-        .replace(/^www\./, '')       // Remove www
-        .split('/')[0];              // Remove any paths
-    }
-  };
-
   const handleBrandLookup = async (domain: string) => {
-    console.log('Starting brand lookup for domain:', domain);
-    console.log('Using API URL:', API_BASE_URL);
-
-    if (!domain) {
-      console.warn('No domain provided');
-      showToast('Please enter a domain', 'error');
-      return;
-    }
-
     // Check if this is a test domain
     if (domain in brandSeeds) {
-      console.log('Using seed data for test domain:', domain);
       const seedData = brandSeeds[domain as keyof typeof brandSeeds];
       
-      setContent(prev => {
-        const newContent = {
-          ...prev,
-          brandName: seedData.name,
-          logoUrl: seedData.logo,
-          brandDescription: seedData.longDescription,
-        };
-        console.log('New content state:', newContent);
-        return newContent;
-      });
+      setContent(prev => ({
+        ...prev,
+        brandName: seedData.name,
+        logoUrl: seedData.logo,
+        smsIcon: seedData.logo,
+        pushIcon: seedData.logo,
+        brandDescription: seedData.longDescription,
+      }));
 
-      setTempLogo(seedData.logo);
-      setShowCropModal(true);
       showToast('Brand information updated successfully!', 'success');
       return;
     }
 
-    // Sanitize the domain before making the API call
-    const sanitizedDomain = sanitizeDomain(domain);
-    console.log('Sanitized domain:', sanitizedDomain);
-
     setLoading(true);
-    const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(sanitizedDomain)}`;
-    console.log('Making request to:', requestUrl);
-
     try {
-      console.log('Sending fetch request...');
+      const sanitizedDomain = sanitizeDomain(domain);
+      const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(sanitizedDomain)}`;
       const response = await fetch(requestUrl);
-      console.log('Received response:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
-      });
-
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error data:', errorData);
         throw new Error(errorData.message || 'Failed to fetch brand information');
       }
       
-      console.log('Parsing response JSON...');
       const data: BrandFetchResponse = await response.json();
-      console.log('Received brand data:', data);
       
       if (!data.name && !data.logo) {
         showToast('No brand information found. Please enter details manually.', 'error');
         return;
       }
 
-      // Get the best description available
       const description = data.longDescription || data.description;
       if (!description) {
         showToast('No brand description found. Please enter details manually.', 'error');
         return;
       }
 
-      console.log('Updating content state with brand information...');
-      setContent(prev => {
-        const newContent = {
-          ...prev,
-          brandName: data.name || prev.brandName,
-          logoUrl: data.logo || prev.logoUrl,
-          brandDescription: description,
-          // Update button colors if primary color is available
-          ...(data.colors?.primary && {
-            inAppCtaText: prev.inAppCtaText,
-            inAppType: prev.inAppType,
-          })
-        };
-        console.log('New content state:', newContent);
-        return newContent;
-      });
-
-      setTempLogo(data.logo);
-      setShowCropModal(true);
+      setContent(prev => ({
+        ...prev,
+        brandName: data.name || prev.brandName,
+        logoUrl: data.logo || prev.logoUrl,
+        smsIcon: data.logo || prev.smsIcon,
+        pushIcon: data.logo || prev.pushIcon,
+        brandDescription: description,
+      }));
 
       showToast('Brand information updated successfully!', 'success');
     } catch (error) {
       console.error('Brand lookup error:', error);
-      console.error('Full error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
       showToast('We were unable to lookup brand, please insert the brand info manually.', 'error');
     } finally {
-      console.log('Brand lookup completed');
       setLoading(false);
     }
-  };
-
-  const handleCropComplete = (smsIcon: string, pushIcon: string) => {
-    setContent({
-      ...content,
-      logoUrl: tempLogo,
-      smsIcon,
-      pushIcon,
-    });
-    setShowCropModal(false);
   };
 
   const handleGenerateContent = async () => {
@@ -426,64 +367,7 @@ function App() {
         <div className="space-y-8">
           {activeChannel === 'sms' && (
             <DeviceFrame title="SMS Preview">
-              <div className="bg-white h-full flex flex-col">
-                {/* iOS Message Header */}
-                <div className="bg-white border-b border-gray-200">
-                  <div className="flex items-center justify-between px-4 pt-2">
-                    <button className="text-[#007AFF] flex items-center">
-                      <ChevronLeft className="w-5 h-5" />
-                      <span>Messages</span>
-                    </button>
-                    <Video className="w-5 h-5 text-[#007AFF]" />
-                  </div>
-                  <div className="flex flex-col items-center py-2">
-                    {content.logoUrl ? (
-                      <img 
-                        src={content.logoUrl} 
-                        alt={content.brandName}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <User className="w-8 h-8 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="mt-1">
-                      <span className="text-base font-medium">{content.brandName}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Messages Container */}
-                <div className="flex-1 bg-white p-4">
-                  <div className="space-y-2">
-                    {/* Initial Message */}
-                    <div className="flex justify-start">
-                      <div className="bg-[#F2F2F7] text-black rounded-2xl px-4 py-2 max-w-[70%]">
-                        <p className="text-base">{content.smsMessage}</p>
-                      </div>
-                    </div>
-
-                    {/* User Reply */}
-                    {content.userReply && (
-                      <div className="flex justify-end">
-                        <div className="bg-[#007AFF] text-white rounded-2xl px-4 py-2 max-w-[70%]">
-                          <p className="text-base">{content.userReply}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Brand Reply */}
-                    {content.brandReply && (
-                      <div className="flex justify-start">
-                        <div className="bg-[#F2F2F7] text-black rounded-2xl px-4 py-2 max-w-[70%]">
-                          <p className="text-base">{content.brandReply}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <SMSPreview content={content} />
             </DeviceFrame>
           )}
 
@@ -550,9 +434,9 @@ function App() {
 
                 {/* Bottom Swipe Indicator */}
                 <div className="absolute inset-x-0 bottom-6 flex flex-col items-center space-y-2">
-                  <div className="flex justify-between w-48">
-                    <img src={flashlightIcon} alt="Flashlight" className="w-6 h-6" />
-                    <img src={cameraIcon} alt="Camera" className="w-6 h-6" />
+                  <div className="flex justify-between w-72">
+                    <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
+                    <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
                   </div>
                   <div className="text-white/60 text-sm font-['SF_Pro_Text']">swipe up to open</div>
                   <div className="w-32 h-1 bg-white rounded-full mt-2" />
@@ -582,7 +466,14 @@ function App() {
           )}
 
           {activeChannel === 'in-app' && (
-            <InAppPreview content={content} />
+            <DeviceFrame title="In-App Preview">
+              <div className="bg-white h-full">
+                <InAppPreview 
+                  content={content} 
+                  onContentChange={handleInputChange}
+                />
+              </div>
+            </DeviceFrame>
           )}
         </div>
       </div>
@@ -598,14 +489,6 @@ function App() {
           <MessageCircle className="w-4 h-4" />
         </a>
       </div>
-
-      {showCropModal && (
-        <ImageCropModal
-          imageUrl={tempLogo}
-          onClose={() => setShowCropModal(false)}
-          onCropComplete={handleCropComplete}
-        />
-      )}
     </div>
   );
 }

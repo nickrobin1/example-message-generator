@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
-import { Battery, Signal, Wifi, Download } from 'lucide-react';
-import { getCurrentTime } from '../utils/time';
+import { Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 interface DeviceFrameProps {
@@ -41,21 +40,9 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title }) => {
           <Download className="w-5 h-5" />
         </button>
       </div>
-      <div ref={deviceRef} className="rounded-[3rem] bg-black p-4 shadow-xl">
-        <div className="relative rounded-[2rem] overflow-hidden h-[700px]">
-          {/* Status Bar */}
-          <div className="absolute top-0 inset-x-0 z-10 flex justify-end items-center px-6 h-7 text-white">
-            <div className="flex items-center gap-1">
-              <Signal className="w-4 h-4" />
-              <Wifi className="w-4 h-4" />
-              <Battery className="w-4 h-4" />
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="h-full">
-            {children}
-          </div>
+      <div ref={deviceRef} className="rounded-[3rem] bg-white/50 p-4 shadow-xl border border-white">
+        <div className="relative rounded-[2rem] overflow-hidden h-[700px] bg-white">
+          {children}
         </div>
       </div>
     </div>
