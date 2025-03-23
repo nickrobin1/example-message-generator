@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Trash, MoreHorizontal, ChevronLeft } from 'lucide-react';
+import ColorThief from 'colorthief';
 import type { MarketingContent } from '../../types';
 
 interface EmailPreviewProps {
@@ -7,8 +8,33 @@ interface EmailPreviewProps {
 }
 
 const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
+  const [primaryColor, setPrimaryColor] = useState<string>('#3D1D72'); // Default purple
   const fromEmail = content.brandName ? `emails@${content.brandName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com` : 'emails@brand.com';
   const senderInfo = `${content.brandName} (${fromEmail})`;
+
+  useEffect(() => {
+    if (content.logoUrl) {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.src = content.logoUrl;
+      
+      img.onload = () => {
+        const colorThief = new ColorThief();
+        try {
+          const [r, g, b] = colorThief.getColor(img);
+          setPrimaryColor(`rgb(${r}, ${g}, ${b})`);
+        } catch (error) {
+          console.error('Error extracting color:', error);
+          setPrimaryColor('#3D1D72'); // Fallback to default purple
+        }
+      };
+
+      img.onerror = () => {
+        console.error('Error loading image for color extraction');
+        setPrimaryColor('#3D1D72'); // Fallback to default purple
+      };
+    }
+  }, [content.logoUrl]);
 
   return (
     <div className="bg-[#F8F7FF] h-full flex flex-col">
@@ -77,7 +103,7 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
           <div className="flex justify-center">
             <button
               className="px-8 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-all"
-              style={{ backgroundColor: content.brandColor || '#3D1D72' }}
+              style={{ backgroundColor: primaryColor }}
             >
               {content.emailCta || 'Click Here'}
             </button>
