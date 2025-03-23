@@ -60,58 +60,68 @@ export const handler: Handler = async (event) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const { brandName, brandDescription } = JSON.parse(event.body || '{}');
+    const { brand } = JSON.parse(event.body || '{}');
 
-    if (!brandName || !brandDescription) {
+    if (!brand?.description) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Brand name and description are required' }),
+        headers,
+        body: JSON.stringify({ error: 'Brand description is required' })
       };
     }
+
+    // Use long description if available, otherwise fall back to regular description
+    const brandDescription = brand.longDescription || brand.description;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [
         {
           role: 'system',
-          content: `You are a marketing content generator. Generate content in the following JSON format:
+          content: `You are a marketing copywriter. Always respond with valid JSON in this exact format:
           {
-            "smsContent": "engaging SMS message under 160 characters",
-            "pushTitle": "attention-grabbing push notification title",
-            "pushBody": "compelling push notification body",
-            "inAppTitle": "eye-catching in-app message title",
-            "inAppBody": "persuasive in-app message body",
-            "inAppCta": "clear call-to-action text",
-            "emailSubject": "compelling email subject line that drives opens",
-            "emailHeadline": "attention-grabbing email headline",
-            "emailBody": "engaging email body text with clear value proposition and persuasive content",
-            "emailCta": "action-oriented button text that encourages clicks"
-          }`,
+            "smsMessage": "short message under 160 chars",
+            "pushTitle": "attention grabbing title",
+            "pushMessage": "brief push notification message",
+            "cardTitle": "engaging card title",
+            "cardDescription": "short card description",
+            "inAppTitle": "welcoming title",
+            "inAppBody": "brief body text",
+            "inAppCtaText": "clear call to action",
+            "emailSubject": "compelling subject line",
+            "emailHeadline": "attention-grabbing headline",
+            "emailBody": "engaging email body text",
+            "emailCta": "clear call to action"
+          }`
         },
         {
           role: 'user',
-          content: `Generate marketing content for ${brandName}. Brand description: ${brandDescription}. 
-          Make the content engaging, persuasive, and aligned with the brand's voice. 
-          For the email content:
-          - Subject line should be attention-grabbing and create urgency
-          - Headline should be compelling and highlight the main value proposition
-          - Body should be concise but informative, focusing on benefits
-          - CTA should be action-oriented and create FOMO`,
-        },
+          content: `Generate marketing content for ${brand.name || 'this brand'}. Use this description: ${brandDescription}`
+        }
       ],
       temperature: 0.7,
       max_tokens: 500,
     });
 
-    const generatedContent = JSON.parse(
-      response.choices[0].message?.content || '{}'
-    );
+    const content = response.choices[0].message?.content || '{}';
+    
+    try {
+      // Clean up markdown formatting if present
+      const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
+      
+      // Validate that we got valid JSON back
+      const parsedContent = JSON.parse(cleanContent);
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(generatedContent)
-    };
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(parsedContent)
+      };
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response:', content);
+      console.error('Parse error:', parseError);
+      throw new Error('Invalid response format from OpenAI');
+    }
   } catch (error) {
     console.error('Error:', error);
     return {
