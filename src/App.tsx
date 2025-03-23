@@ -21,6 +21,7 @@ import brazeLogoIcon from './assets/Braze Logo Icon.png';
 import { brandSeeds } from './data/brandSeeds';
 import FakeBrandAutocomplete from './components/FakeBrandAutocomplete';
 import SMSPreview from './components/channels/SMSPreview';
+import { analytics } from './lib/analytics';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -127,6 +128,11 @@ function App() {
   };
 
   const handleBrandLookup = async (domain: string) => {
+    if (!domain.trim()) {
+      showToast('Please enter a domain name', 'error');
+      return;
+    }
+
     // Check if this is a test domain
     if (domain in brandSeeds) {
       const seedData = brandSeeds[domain as keyof typeof brandSeeds];
@@ -215,6 +221,7 @@ function App() {
         ...generatedContent
       }));
 
+      analytics.trackGenerateClick();
       showToast('Marketing content generated successfully!', 'success');
     } catch (error) {
       console.error('AI content generation error:', error);
@@ -284,15 +291,16 @@ function App() {
                       type="text"
                       placeholder="example.com"
                       className="flex-1 rounded-l-lg border-gray-200 focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter') {
+                          e.preventDefault();
                           handleBrandLookup((e.target as HTMLInputElement).value);
                         }
                       }}
                     />
                     <button
-                      onClick={(e) => {
-                        const input = (e.target as HTMLElement).closest('div')?.querySelector('input');
+                      onClick={() => {
+                        const input = document.querySelector('input[type="text"]') as HTMLInputElement;
                         if (input) handleBrandLookup(input.value);
                       }}
                       disabled={loading}
@@ -313,6 +321,7 @@ function App() {
                   value={content.brandName}
                   onChange={(value) => handleInputChange('brandName', value)}
                   onSelectBrand={(brand) => {
+                    analytics.trackBrandLookup(brand.name);
                     setContent(prev => ({
                       ...prev,
                       brandName: brand.name,
@@ -498,6 +507,7 @@ function App() {
           href="https://docs.google.com/forms/d/e/1FAIpQLSdrw8jpZMNFU3GMj_u3gnSTh5cDtLmWmlI5fHi-eZMDLDV5DQ/viewform"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => analytics.trackFeedbackSubmit('positive')}
           className="flex items-center gap-2 bg-[#3D1D72] text-white px-4 py-2 rounded-full hover:bg-[#2D1655] transition-colors"
         >
           <MessageCircle className="w-4 h-4" />
