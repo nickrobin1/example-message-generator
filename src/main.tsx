@@ -16,18 +16,20 @@ const initializePostHog = () => {
         throw new Error('PostHog configuration is missing. Please check your environment variables.');
       }
 
-      console.log('Initializing PostHog with:', {
-        key: posthogKey ? 'Present' : 'Missing',
-        host: posthogHost ? 'Present' : 'Missing'
-      });
+      // Only log in development
+      if (import.meta.env.DEV) {
+        console.log('PostHog initialization started');
+      }
 
       resolve({
         apiKey: posthogKey,
         options: {
           api_host: posthogHost,
           loaded: (posthogInstance: typeof posthog) => {
-            posthogInstance.debug() // Enable debug mode temporarily
-            console.log('PostHog initialized successfully');
+            if (import.meta.env.DEV) {
+              posthogInstance.debug() // Enable debug mode only in development
+              console.log('PostHog initialized successfully');
+            }
           },
           capture_pageview: true,
           capture_pageleave: true,
