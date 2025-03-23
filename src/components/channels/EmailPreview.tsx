@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Trash, MoreHorizontal } from 'lucide-react';
+import { Mail, Trash, MoreHorizontal, ChevronLeft } from 'lucide-react';
 import type { MarketingContent } from '../../types';
 
 interface EmailPreviewProps {
@@ -8,30 +8,38 @@ interface EmailPreviewProps {
 
 const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
   const fromEmail = content.brandName ? `emails@${content.brandName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com` : 'emails@brand.com';
+  const senderInfo = `${content.brandName} (${fromEmail})`;
 
   return (
     <div className="bg-[#F8F7FF] h-full flex flex-col">
       {/* Email Header */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <div className="flex-1">
-          <div className="flex items-center text-gray-800">
-            <span className="font-medium">From:</span>
-            <span className="ml-1 text-[#3D1D72]">{content.brandName}</span>
+      <div className="p-4 border-b border-gray-200 flex flex-col">
+        {/* Top Icons Row */}
+        <div className="flex items-center justify-between mb-3">
+          <button className="text-gray-500">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex items-center space-x-4 text-gray-500">
+            <button>
+              <Trash className="w-5 h-5" />
+            </button>
+            <button>
+              <Mail className="w-5 h-5" />
+            </button>
+            <button>
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
           </div>
-          <div className="text-sm text-gray-500">{fromEmail}</div>
-          <div className="font-medium mt-1">{content.emailSubject}</div>
         </div>
-        <div className="flex items-center space-x-4 text-gray-500">
-          <button>
-            <Trash className="w-5 h-5" />
-          </button>
-          <button>
-            <Mail className="w-5 h-5" />
-          </button>
-          <button>
-            <MoreHorizontal className="w-5 h-5" />
-          </button>
+        
+        {/* From Line */}
+        <div className="flex items-center text-gray-800">
+          <span className="font-medium mr-1">From:</span>
+          <span className="truncate text-[#3D1D72]">{senderInfo}</span>
         </div>
+        
+        {/* Subject Line */}
+        <div className="font-medium mt-1">{content.emailSubject}</div>
       </div>
 
       {/* Email Content */}
@@ -49,15 +57,11 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
           )}
 
           {/* Hero Image */}
-          {content.emailImage ? (
-            <img
-              src={content.emailImage}
-              alt="Email hero"
-              className="w-full h-48 object-cover rounded-lg mb-6"
-            />
-          ) : (
-            <div className="w-full h-48 bg-gray-200 rounded-lg mb-6" />
-          )}
+          <img
+            src={content.emailImage || content.cardImage || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80'}
+            alt="Email hero"
+            className="w-full h-48 object-cover rounded-lg mb-6"
+          />
 
           {/* Headline */}
           <h1 className="text-2xl font-bold text-center mb-4">
