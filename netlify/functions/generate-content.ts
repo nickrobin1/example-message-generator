@@ -89,10 +89,15 @@ export const handler: Handler = async (event) => {
             "inAppBody": "brief body text",
             "inAppCtaText": "clear call to action",
             "emailSubject": "compelling subject line",
-            "emailHeadline": "attention-grabbing headline",
-            "emailBody": "engaging email body text",
-            "emailCta": "clear call to action"
-          }`
+            "emailHeadline": "short, attention-grabbing headline (max 1 line)",
+            "emailBody": "concise body text focusing on key benefits (2-3 lines max)",
+            "emailCta": "clear call to action (2-4 words)"
+          }
+          
+          Keep email content especially concise:
+          - Headline should be one line only
+          - Body text should be 2-3 lines maximum
+          - CTA should be short and action-oriented`
         },
         {
           role: 'user',

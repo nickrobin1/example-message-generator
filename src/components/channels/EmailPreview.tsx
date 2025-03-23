@@ -33,9 +33,9 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
         </div>
         
         {/* From Line */}
-        <div className="flex items-center text-gray-800">
+        <div className="flex items-center">
           <span className="font-medium mr-1">From:</span>
-          <span className="truncate text-[#3D1D72]">{senderInfo}</span>
+          <span className="truncate text-black">{senderInfo}</span>
         </div>
         
         {/* Subject Line */}
