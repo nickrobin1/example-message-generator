@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
+import { analytics } from '../lib/analytics';
 
 interface DeviceFrameProps {
   children: React.ReactNode;
@@ -23,6 +24,9 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title }) => {
       link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-preview.png`;
       link.href = dataUrl;
       link.click();
+
+      // Track the export event
+      analytics.trackExportClick(title.toLowerCase());
     } catch (error) {
       console.error('Error generating preview:', error);
     }

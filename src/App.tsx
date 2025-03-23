@@ -33,6 +33,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [domainInput, setDomainInput] = useState('');
   const [content, setContent] = useState<MarketingContent>({
     brandName: 'Your Brand',
     logoUrl: '',
@@ -132,6 +133,9 @@ function App() {
       showToast('Please enter a domain name', 'error');
       return;
     }
+
+    // Track the brand lookup attempt
+    analytics.trackBrandLookup(domain);
 
     // Check if this is a test domain
     if (domain in brandSeeds) {
@@ -289,22 +293,21 @@ function App() {
                   <div className="flex rounded-lg shadow-sm">
                     <input
                       type="text"
+                      value={domainInput}
+                      onChange={(e) => setDomainInput(e.target.value)}
                       placeholder="example.com"
                       className="flex-1 rounded-l-lg border-gray-200 focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
-                          handleBrandLookup((e.target as HTMLInputElement).value);
+                          handleBrandLookup(domainInput);
                         }
                       }}
                     />
                     <button
-                      onClick={() => {
-                        const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-                        if (input) handleBrandLookup(input.value);
-                      }}
+                      onClick={() => handleBrandLookup(domainInput)}
                       disabled={loading}
-                      className="inline-flex items-center px-4 py-2 border border-l-0 border-gray-200 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100"
+                      className="inline-flex items-center px-4 py-2 border border-l-0 border-gray-200 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? (
                         <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
