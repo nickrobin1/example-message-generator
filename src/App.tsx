@@ -22,6 +22,8 @@ import { brandSeeds } from './data/brandSeeds';
 import FakeBrandAutocomplete from './components/FakeBrandAutocomplete';
 import SMSPreview from './components/channels/SMSPreview';
 import { analytics } from './lib/analytics';
+import EmailEditor from './components/channels/EmailEditor';
+import EmailPreview from './components/channels/EmailPreview';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -59,7 +61,12 @@ function App() {
     pushIcon: '',
     inAppInputLabel: 'Email Address',
     inAppInputPlaceholder: 'Enter your email to get updates',
-    inAppSubmitButtonText: 'Sign Up'
+    inAppSubmitButtonText: 'Sign Up',
+    emailSubject: '',
+    emailHeadline: '',
+    emailBody: '',
+    emailCta: '',
+    emailImage: '',
   });
 
   useEffect(() => {
@@ -381,6 +388,9 @@ function App() {
           {activeChannel === 'push' && (
             <PushEditor content={content} onContentChange={handleInputChange} />
           )}
+          {activeChannel === 'email' && (
+            <EmailEditor content={content} onContentChange={handleInputChange} />
+          )}
           {activeChannel === 'card' && (
             <CardEditor content={content} onContentChange={handleInputChange} />
           )}
@@ -468,6 +478,12 @@ function App() {
                   <div className="w-32 h-1 bg-white rounded-full mt-2" />
                 </div>
               </div>
+            </DeviceFrame>
+          )}
+
+          {activeChannel === 'email' && (
+            <DeviceFrame title="Email Preview">
+              <EmailPreview content={content} />
             </DeviceFrame>
           )}
 

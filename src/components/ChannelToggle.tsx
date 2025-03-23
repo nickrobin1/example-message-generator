@@ -1,5 +1,5 @@
-import * as ToggleGroup from '@radix-ui/react-toggle-group';
-import { MessageSquare, Bell, LayoutDashboard, MessageCircle } from 'lucide-react';
+import React from 'react';
+import { MessageCircle, Bell, Layout, Mail } from 'lucide-react';
 
 interface ChannelToggleProps {
   value: string;
@@ -8,43 +8,55 @@ interface ChannelToggleProps {
 
 const ChannelToggle: React.FC<ChannelToggleProps> = ({ value, onValueChange }) => {
   return (
-    <ToggleGroup.Root
-      className="inline-flex bg-gray-100 rounded-lg p-1 gap-1"
-      type="single"
-      value={value}
-      onValueChange={(value) => {
-        if (value) onValueChange(value);
-      }}
-    >
-      <ToggleGroup.Item
-        className="flex items-center gap-2 px-4 py-2 rounded-md data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all"
-        value="sms"
+    <div className="inline-flex p-1 space-x-1 bg-white rounded-lg shadow-sm">
+      <button
+        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          value === 'sms'
+            ? 'bg-[#3D1D72] text-white'
+            : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+        }`}
+        onClick={() => onValueChange('sms')}
       >
-        <MessageSquare className="w-4 h-4" />
+        <MessageCircle className="w-4 h-4" />
         <span>SMS</span>
-      </ToggleGroup.Item>
-      <ToggleGroup.Item
-        className="flex items-center gap-2 px-4 py-2 rounded-md data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all"
-        value="push"
+      </button>
+
+      <button
+        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          value === 'push'
+            ? 'bg-[#3D1D72] text-white'
+            : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+        }`}
+        onClick={() => onValueChange('push')}
       >
         <Bell className="w-4 h-4" />
         <span>Push</span>
-      </ToggleGroup.Item>
-      <ToggleGroup.Item
-        className="flex items-center gap-2 px-4 py-2 rounded-md data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all"
-        value="card"
+      </button>
+
+      <button
+        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          value === 'email'
+            ? 'bg-[#3D1D72] text-white'
+            : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+        }`}
+        onClick={() => onValueChange('email')}
       >
-        <LayoutDashboard className="w-4 h-4" />
-        <span>Card</span>
-      </ToggleGroup.Item>
-      <ToggleGroup.Item
-        className="flex items-center gap-2 px-4 py-2 rounded-md data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all"
-        value="in-app"
+        <Mail className="w-4 h-4" />
+        <span>Email</span>
+      </button>
+
+      <button
+        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          value === 'in-app'
+            ? 'bg-[#3D1D72] text-white'
+            : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+        }`}
+        onClick={() => onValueChange('in-app')}
       >
-        <MessageCircle className="w-4 h-4" />
+        <Layout className="w-4 h-4" />
         <span>In-App</span>
-      </ToggleGroup.Item>
-    </ToggleGroup.Root>
+      </button>
+    </div>
   );
 };
 

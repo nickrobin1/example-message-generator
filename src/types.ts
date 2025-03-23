@@ -1,30 +1,46 @@
-export type MarketingContent = {
+export interface MarketingContent {
+  // Brand info
   brandName: string;
   logoUrl: string;
   brandDescription: string;
+
+  // SMS
   smsMessage: string;
+  smsIcon: string;
+
+  // Push
   pushTitle: string;
   pushMessage: string;
+  pushIcon: string;
+
+  // Card
   cardTitle: string;
   cardDescription: string;
   cardImage: string;
-  userReply: string;
-  brandReply: string;
-  inAppType: string;
+
+  // Email
+  emailSubject: string;
+  emailHeadline: string;
+  emailBody: string;
+  emailCta: string;
+  emailImage: string;
+
+  // In-App Message
+  inAppType: 'modal-logo' | 'modal-image' | 'survey' | 'information-capture';
   inAppTitle: string;
   inAppBody: string;
-  inAppImage: string;
   inAppCtaText: string;
+  inAppImage: string;
+  inAppBackgroundImage: string;
   inAppSurveyOptions: string[];
   inAppSelectedOptions: string[];
-  inAppSurveyType: string;
-  inAppBackgroundImage: string;
-  smsIcon: string;
-  pushIcon: string;
-  inAppInputLabel?: string;
-  inAppInputPlaceholder?: string;
-  inAppSubmitButtonText?: string;
-};
+  inAppSurveyType: 'single' | 'multiple';
+  inAppInputLabel: string;
+  inAppInputPlaceholder: string;
+  inAppSubmitButtonText: string;
+  userReply: string;
+  brandReply: string;
+}
 
 export interface BrandFetchResponse {
   name: string;

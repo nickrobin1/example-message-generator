@@ -84,7 +84,11 @@ export const handler: Handler = async (event) => {
   "cardDescription": "short card description",
   "inAppTitle": "welcoming title",
   "inAppBody": "brief body text",
-  "inAppCtaText": "clear call to action"
+  "inAppCtaText": "clear call to action",
+  "emailSubject": "compelling subject line",
+  "emailHeadline": "attention-grabbing headline",
+  "emailBody": "engaging email body text",
+  "emailCta": "clear call to action"
 }`
         },
         {
