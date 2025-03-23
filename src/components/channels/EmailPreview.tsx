@@ -13,7 +13,7 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
   return (
     <div className="bg-[#F8F7FF] h-full flex flex-col">
       {/* Email Header */}
-      <div className="p-4 border-b border-gray-200 flex flex-col">
+      <div className="p-4 border-b border-gray-200 flex flex-col bg-white">
         {/* Top Icons Row */}
         <div className="flex items-center justify-between mb-3">
           <button className="text-gray-500">
@@ -43,7 +43,7 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
       </div>
 
       {/* Email Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-white">
         <div className="max-w-2xl mx-auto p-6">
           {/* Logo */}
           {content.logoUrl && (
