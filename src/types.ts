@@ -3,6 +3,7 @@ export interface MarketingContent {
   brandName: string;
   logoUrl: string;
   brandDescription: string;
+  brandColor?: string;
 
   // SMS
   smsMessage: string;

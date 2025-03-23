@@ -51,6 +51,10 @@ export async function generateMarketingContent(brandData: BrandFetchResponse): P
       inAppTitle: data.inAppTitle,
       inAppBody: data.inAppBody,
       inAppCtaText: data.inAppCtaText,
+      emailSubject: data.emailSubject,
+      emailHeadline: data.emailHeadline,
+      emailBody: data.emailBody,
+      emailCta: data.emailCta,
     };
   } catch (error) {
     console.error('Content generation error:', error);
