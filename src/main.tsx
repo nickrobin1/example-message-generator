@@ -4,13 +4,28 @@ import { PostHogProvider } from 'posthog-js/react';
 import posthog from 'posthog-js';
 import App from './App.tsx';
 import './index.css';
+import { injectEnv } from './env';
+
+// Declare window.ENV type
+declare global {
+  interface Window {
+    ENV?: {
+      VITE_PUBLIC_POSTHOG_KEY?: string;
+      VITE_PUBLIC_POSTHOG_HOST?: string;
+    }
+  }
+}
+
+// Inject environment variables
+injectEnv();
 
 // Initialize PostHog with proper error handling
 const initializePostHog = () => {
   return new Promise((resolve, reject) => {
     try {
-      const posthogKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY;
-      const posthogHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST;
+      // Access environment variables through window to prevent build-time inclusion
+      const posthogKey = window.ENV?.VITE_PUBLIC_POSTHOG_KEY;
+      const posthogHost = window.ENV?.VITE_PUBLIC_POSTHOG_HOST;
 
       if (!posthogKey || !posthogHost) {
         throw new Error('PostHog configuration is missing. Please check your environment variables.');
