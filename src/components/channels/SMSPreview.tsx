@@ -107,12 +107,32 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
             </span>
           </div>
 
-          {/* Message Bubble */}
-          <div className="max-w-[85%] bg-[#E9E9EB] rounded-3xl px-4 py-2">
+          {/* Initial Message Bubble */}
+          <div className="max-w-[85%] bg-[#E9E9EB] rounded-3xl px-4 py-2 mb-4">
             <p className="text-black text-base font-['SF_Pro_Text']">
               {content.smsMessage || 'Your message will appear here'}
             </p>
           </div>
+
+          {/* User Reply */}
+          {content.userReply && (
+            <div className="flex justify-end mb-4">
+              <div className="max-w-[85%] bg-[#007AFF] rounded-3xl px-4 py-2">
+                <p className="text-white text-base font-['SF_Pro_Text']">
+                  {content.userReply}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Brand Reply */}
+          {content.userReply && content.brandReply && (
+            <div className="max-w-[85%] bg-[#E9E9EB] rounded-3xl px-4 py-2">
+              <p className="text-black text-base font-['SF_Pro_Text']">
+                {content.brandReply}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

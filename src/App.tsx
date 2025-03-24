@@ -424,13 +424,13 @@ function App() {
         {/* Preview Section */}
         <div className="space-y-8">
           {activeChannel === 'sms' && (
-            <DeviceFrame title="SMS Preview">
+            <DeviceFrame title="SMS Preview" content={content}>
               <SMSPreview content={content} />
             </DeviceFrame>
           )}
 
           {activeChannel === 'push' && (
-            <DeviceFrame title="Push Notification Preview">
+            <DeviceFrame title="Push Notification Preview" content={content}>
               <div className="relative h-full">
                 {/* Gradient Background */}
                 <div 
@@ -511,13 +511,13 @@ function App() {
           )}
 
           {activeChannel === 'email' && (
-            <DeviceFrame title="Email Preview">
+            <DeviceFrame title="Email Preview" content={content}>
               <EmailPreview content={content} />
             </DeviceFrame>
           )}
 
           {activeChannel === 'card' && (
-            <DeviceFrame title="Card Preview">
+            <DeviceFrame title="Card Preview" content={content}>
               <div className="bg-white h-full p-4">
                 <div className="bg-white rounded-lg overflow-hidden shadow">
                   {content.cardImage && (
@@ -537,7 +537,7 @@ function App() {
           )}
 
           {activeChannel === 'in-app' && (
-            <DeviceFrame title="In-App Preview">
+            <DeviceFrame title="In-App Preview" content={content}>
               <div className="bg-white h-full">
                 <InAppPreview 
                   content={content} 

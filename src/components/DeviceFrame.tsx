@@ -2,13 +2,15 @@ import React, { useRef } from 'react';
 import { Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { analytics } from '../lib/analytics';
+import type { MarketingContent } from '../types';
 
 interface DeviceFrameProps {
   children: React.ReactNode;
   title: string;
+  content: MarketingContent;
 }
 
-const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title }) => {
+const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) => {
   const deviceRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = async () => {
@@ -20,8 +22,12 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title }) => {
         pixelRatio: 2,
       });
       
+      const brandName = content.brandName?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'brand';
+      const channel = title.toLowerCase().replace(/\s+preview$/, '');
+      const filename = `${brandName}-${channel}-preview.png`;
+      
       const link = document.createElement('a');
-      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-preview.png`;
+      link.download = filename;
       link.href = dataUrl;
       link.click();
 
