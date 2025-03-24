@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Video, User, MessageCircle, Search, Wand2, X } from 'lucide-react';
+import { ChevronLeft, Video, User, Building2, MessageCircle, Search, Wand2, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import DeviceFrame from './components/DeviceFrame';
 import ChannelToggle from './components/ChannelToggle';
@@ -24,6 +24,7 @@ import SMSPreview from './components/channels/SMSPreview';
 import { analytics } from './lib/analytics';
 import EmailEditor from './components/channels/EmailEditor';
 import EmailPreview from './components/channels/EmailPreview';
+import ImageInput from './components/ImageInput';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -356,16 +357,12 @@ function App() {
                     }}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">Logo URL</label>
-                  <input
-                    type="text"
-                    value={content.logoUrl}
-                    onChange={(e) => handleInputChange('logoUrl', e.target.value)}
-                    className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
-                    placeholder="https://example.com/logo.png"
-                  />
-                </div>
+                <ImageInput
+                  value={content.logoUrl}
+                  onChange={(value) => handleInputChange('logoUrl', value)}
+                  label="Logo"
+                  placeholder="https://example.com/logo.png"
+                />
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">Brand Description</label>
                   <textarea
@@ -503,14 +500,14 @@ function App() {
                             className="w-[40px] h-[40px] rounded-[8px] object-cover"
                           />
                         ) : (
-                          <div className="w-[40px] h-[40px] rounded-[8px] bg-blue-600 flex items-center justify-center">
-                            <User className="w-6 h-6 text-white" />
+                          <div className="w-[40px] h-[40px] rounded-[8px] bg-gray-100 flex items-center justify-center">
+                            <Building2 className="w-6 h-6 text-gray-400" />
                           </div>
                         )}
                         <div className="flex flex-col gap-1">
-                          <span className="text-[15px] font-semibold leading-none">{content.brandName}</span>
+                          <span className="text-[15px] font-semibold leading-none">{content.brandName || '{{Brand Name}}'}</span>
                           <p className="text-[14px] leading-[1.2] text-black">
-                            {content.pushMessage}
+                            {content.pushMessage || 'Your message will appear here'}
                           </p>
                         </div>
                       </div>

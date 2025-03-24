@@ -29,7 +29,7 @@ export interface MarketingContent {
   emailImage: string;
 
   // In-App Message
-  inAppType: 'modal-logo' | 'modal-image' | 'survey' | 'information-capture';
+  inAppType: 'modal-logo' | 'modal-image' | 'survey' | 'email-phone-capture' | 'fullscreen';
   inAppTitle: string;
   inAppBody: string;
   inAppCtaText: string;

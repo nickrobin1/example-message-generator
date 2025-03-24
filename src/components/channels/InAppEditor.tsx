@@ -1,6 +1,7 @@
 import React from 'react';
-import { MessageCircle, Upload } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { MarketingContent } from '../../types';
+import ImageInput from '../ImageInput';
 
 interface InAppEditorProps {
   content: MarketingContent;
@@ -41,76 +42,19 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Type</label>
+          <label className="block text-sm font-medium text-gray-700">Message Type</label>
           <select
             value={content.inAppType}
-            onChange={(e) => {
-              onContentChange('inAppType', e.target.value);
-              // Clear selections when changing type
-              onContentChange('inAppSelectedOptions', []);
-            }}
+            onChange={(e) => onContentChange('inAppType', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="modal-logo">Modal with Logo</option>
             <option value="modal-image">Modal with Image</option>
-            <option value="fullscreen">Full Screen</option>
-            <option value="survey">Simple Survey</option>
-            <option value="information-capture">Information Capture</option>
+            <option value="survey">Survey</option>
+            <option value="email-phone-capture">Email/Phone Capture</option>
+            <option value="fullscreen">Fullscreen</option>
           </select>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Background Image</label>
-          <div className="mt-1 flex items-center gap-4">
-            <label className="flex-1 cursor-pointer">
-              <div className={`flex items-center justify-center border-2 border-dashed rounded-lg px-6 py-4 ${content.inAppBackgroundImage ? 'border-blue-300 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
-                <div className="text-center">
-                  <Upload className={`mx-auto h-8 w-8 ${content.inAppBackgroundImage ? 'text-blue-500' : 'text-gray-400'}`} />
-                  <div className="mt-2">
-                    <span className="text-sm font-medium text-gray-900">
-                      {content.inAppBackgroundImage ? 'Change background image' : 'Upload background image'}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-gray-500">PNG, JPG up to 10MB</p>
-                </div>
-              </div>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </label>
-            {content.inAppBackgroundImage && (
-              <button
-                onClick={() => onContentChange('inAppBackgroundImage', '')}
-                className="px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-          <p className="mt-1 text-sm text-gray-500">
-            Add a screenshot of your app to show how the modal would look in context
-          </p>
-        </div>
-
-        {content.inAppType === 'survey' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Survey Options</label>
-            {content.inAppSurveyOptions.map((option, index) => (
-              <div key={index} className="mb-2">
-                <input
-                  type="text"
-                  value={option}
-                  onChange={(e) => handleSurveyOptionChange(index, e.target.value)}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={`Option ${index + 1}`}
-                />
-              </div>
-            ))}
-          </div>
-        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Title</label>
@@ -119,58 +63,20 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
             value={content.inAppTitle}
             onChange={(e) => onContentChange('inAppTitle', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Enter title..."
+            placeholder="Welcome to {{Brand Name}}"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Message</label>
+          <label className="block text-sm font-medium text-gray-700">Body</label>
           <textarea
             value={content.inAppBody}
             onChange={(e) => onContentChange('inAppBody', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             rows={3}
-            placeholder="Enter message..."
+            placeholder="We're excited to have you here! Get started by exploring our features."
           />
         </div>
-
-        {(content.inAppType === 'modal-image' || content.inAppType === 'fullscreen') && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Image URL</label>
-            <input
-              type="text"
-              value={content.inAppImage}
-              onChange={(e) => onContentChange('inAppImage', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
-        )}
-
-        {content.inAppType === 'information-capture' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Input Field Label</label>
-              <input
-                type="text"
-                value={content.inAppInputLabel || ''}
-                onChange={(e) => onContentChange('inAppInputLabel', e.target.value)}
-                placeholder="e.g., Email Address"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Input Field Placeholder</label>
-              <input
-                type="text"
-                value={content.inAppInputPlaceholder || ''}
-                onChange={(e) => onContentChange('inAppInputPlaceholder', e.target.value)}
-                placeholder="e.g., Enter your email to get updates"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-          </>
-        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700">CTA Text</label>
@@ -179,8 +85,86 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
             value={content.inAppCtaText}
             onChange={(e) => onContentChange('inAppCtaText', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Enter CTA text..."
+            placeholder="Get Started"
           />
+        </div>
+
+        {(content.inAppType === 'modal-image' || content.inAppType === 'fullscreen') && (
+          <ImageInput
+            value={content.inAppImage}
+            onChange={(value) => onContentChange('inAppImage', value)}
+            label="In-App Image"
+            placeholder="https://example.com/in-app-image.jpg"
+          />
+        )}
+
+        {content.inAppType === 'survey' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Survey Options</label>
+            <div className="mt-2 space-y-2">
+              {[0, 1, 2].map((index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={content.inAppSurveyOptions[index] || ''}
+                  onChange={(e) => {
+                    const newOptions = [...content.inAppSurveyOptions];
+                    newOptions[index] = e.target.value;
+                    onContentChange('inAppSurveyOptions', newOptions);
+                  }}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={`Option ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {content.inAppType === 'email-phone-capture' && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Input Label</label>
+              <input
+                type="text"
+                value={content.inAppInputLabel}
+                onChange={(e) => onContentChange('inAppInputLabel', e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Email Address"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Input Placeholder</label>
+              <input
+                type="text"
+                value={content.inAppInputPlaceholder}
+                onChange={(e) => onContentChange('inAppInputPlaceholder', e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Enter your email to get updates"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Submit Button Text</label>
+              <input
+                type="text"
+                value={content.inAppSubmitButtonText}
+                onChange={(e) => onContentChange('inAppSubmitButtonText', e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Submit"
+              />
+            </div>
+          </>
+        )}
+
+        <div className="border-t pt-4 mt-4">
+          <ImageInput
+            value={content.inAppBackgroundImage}
+            onChange={(value) => onContentChange('inAppBackgroundImage', value)}
+            label="App Background Image"
+            placeholder="https://example.com/background-image.jpg"
+          />
+          <p className="mt-2 text-sm text-gray-500">
+            Add a screenshot of your app to preview how the message will look in context
+          </p>
         </div>
       </div>
     </div>

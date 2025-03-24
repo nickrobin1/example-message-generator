@@ -65,20 +65,26 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({ content }) => {
         </div>
         
         {/* Subject Line */}
-        <div className="font-medium mt-1">{content.emailSubject}</div>
+        <div className="font-medium mt-1">{content.emailSubject || 'Welcome to {{Brand Name}}'}</div>
       </div>
 
       {/* Email Content */}
       <div className="flex-1 overflow-auto bg-white">
         <div className="max-w-2xl mx-auto p-6">
           {/* Logo */}
-          {content.logoUrl && (
+          {content.logoUrl ? (
             <div className="mb-6 flex justify-center">
               <img
                 src={content.logoUrl}
                 alt={content.brandName}
                 className="h-12 object-contain"
               />
+            </div>
+          ) : (
+            <div className="mb-6 flex justify-center">
+              <div className="h-12 w-32 bg-purple-100 flex items-center justify-center rounded">
+                <span className="text-lg font-bold text-purple-600">LOGO</span>
+              </div>
             </div>
           )}
 
