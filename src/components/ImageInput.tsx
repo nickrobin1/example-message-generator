@@ -25,7 +25,24 @@ export default function ImageInput({ value, onChange, label, placeholder = 'http
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-600">{label}</label>
-      <div className="flex flex-col gap-2">
+      {value ? (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded overflow-hidden">
+            <img
+              src={value}
+              alt={label}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <button
+            onClick={() => onChange('')}
+            className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+            title="Remove image"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
         <div className="flex gap-2">
           <input
             type="text"
@@ -41,32 +58,15 @@ export default function ImageInput({ value, onChange, label, placeholder = 'http
             <Upload className="w-4 h-4 mr-1" />
             Upload
           </button>
-          {value && (
-            <button
-              onClick={() => onChange('')}
-              className="inline-flex items-center px-3 py-2 border border-gray-200 rounded-lg shadow-sm text-sm font-medium text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72]"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-        {value && (
-          <div className="mt-2">
-            <img
-              src={value}
-              alt="Preview"
-              className="max-h-32 rounded-lg object-contain"
-            />
-          </div>
-        )}
-      </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
     </div>
   );
 } 
