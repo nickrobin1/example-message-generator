@@ -1,15 +1,18 @@
-import type { BrandFetchResponse, MarketingContent } from '../types';
+import type { BrandFetchResponse, MarketingContent, ContentType } from '../types';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
   ? window.location.origin
   : 'http://localhost:8888';
 
-export async function generateMarketingContent(brandData: BrandFetchResponse): Promise<Partial<MarketingContent>> {
+export async function generateMarketingContent(
+  brandData: BrandFetchResponse,
+  contentType: ContentType = 'General Marketing'
+): Promise<Partial<MarketingContent>> {
   console.log('Generating content with API URL:', API_BASE_URL);
   console.log('Request payload:', {
     brand: brandData,
-    model: 'gpt-4o-mini'
+    contentType,
   });
   
   try {
@@ -20,7 +23,7 @@ export async function generateMarketingContent(brandData: BrandFetchResponse): P
       },
       body: JSON.stringify({
         brand: brandData,
-        model: 'gpt-4o-mini', // Using the correct model name
+        contentType,
       }),
     });
 
@@ -44,7 +47,6 @@ export async function generateMarketingContent(brandData: BrandFetchResponse): P
 
     return {
       smsMessage: data.smsMessage,
-      pushTitle: data.pushTitle,
       pushMessage: data.pushMessage,
       cardTitle: data.cardTitle,
       cardDescription: data.cardDescription,

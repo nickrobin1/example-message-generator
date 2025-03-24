@@ -60,7 +60,7 @@ export const handler: Handler = async (event) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const { brand } = JSON.parse(event.body || '{}');
+    const { brand, contentType = 'General Marketing' } = JSON.parse(event.body || '{}');
 
     if (!brand?.description) {
       return {
@@ -73,15 +73,26 @@ export const handler: Handler = async (event) => {
     // Use long description if available, otherwise fall back to regular description
     const brandDescription = brand.longDescription || brand.description;
 
+    // Define content type specific instructions
+    const contentTypeInstructions = {
+      'General Marketing': 'Focus on general brand awareness, product highlights, and value propositions.',
+      'Retention': 'Focus on customer satisfaction, continued engagement, and reinforcing the value of staying with the brand.',
+      'Loyalty': 'Focus on rewards, exclusive benefits, VIP treatment, and making customers feel special.',
+      'Transactional': 'Focus on order confirmations, shipping updates, and account-related notifications. Keep it clear and informative.',
+      'Onboarding': 'Focus on welcome messages, getting started guides, and helping users activate and understand key features.'
+    };
+
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4',
       messages: [
         {
           role: 'system',
-          content: `You are a marketing copywriter. Always respond with valid JSON in this exact format:
+          content: `You are a marketing copywriter specializing in ${contentType.toLowerCase()} messaging. 
+          ${contentTypeInstructions[contentType as keyof typeof contentTypeInstructions]}
+          
+          Always respond with valid JSON in this exact format:
           {
             "smsMessage": "short message under 160 chars",
-            "pushTitle": "attention grabbing title",
             "pushMessage": "brief push notification message",
             "cardTitle": "engaging card title",
             "cardDescription": "short card description",
@@ -97,15 +108,17 @@ export const handler: Handler = async (event) => {
           Keep email content especially concise:
           - Headline should be one line only
           - Body text should be 2-3 lines maximum
-          - CTA should be short and action-oriented`
+          - CTA should be short and action-oriented
+          
+          Ensure all content aligns with ${contentType.toLowerCase()} messaging best practices and the brand's voice.`
         },
         {
           role: 'user',
-          content: `Generate marketing content for ${brand.name || 'this brand'}. Use this description: ${brandDescription}`
+          content: `Generate ${contentType.toLowerCase()} messaging content for this brand: ${brandDescription}`
         }
       ],
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: 1000,
     });
 
     const content = response.choices[0].message?.content || '{}';

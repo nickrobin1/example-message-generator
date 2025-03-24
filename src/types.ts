@@ -1,9 +1,12 @@
+export type ContentType = 'General Marketing' | 'Retention' | 'Loyalty' | 'Transactional' | 'Onboarding';
+
 export interface MarketingContent {
   // Brand info
   brandName: string;
   logoUrl: string;
   brandDescription: string;
   brandColor?: string;
+  contentType: ContentType;
 
   // SMS
   smsMessage: string;

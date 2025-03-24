@@ -11,7 +11,7 @@ import InAppPreview from './components/channels/InAppPreview';
 import WelcomeModal from './components/WelcomeModal';
 import { getCurrentTime } from './utils/time';
 import { generateMarketingContent } from './utils/ai';
-import type { MarketingContent, BrandFetchResponse } from './types';
+import type { MarketingContent, BrandFetchResponse, ContentType } from './types';
 import wallpaperImage from './assets/iOS wallpaper.png';
 import flashlightIcon from './assets/Flashlight button.svg';
 import cameraIcon from './assets/Camera button.svg';
@@ -42,6 +42,7 @@ function App() {
     logoUrl: '',
     brandDescription: '',
     brandColor: '#3D1D72',
+    contentType: 'General Marketing',
     smsMessage: 'Your message will appear here',
     smsIcon: '',
     pushMessage: 'Your message will appear here',
@@ -70,6 +71,7 @@ function App() {
     brandReply: '',
   });
   const [shouldGenerateContent, setShouldGenerateContent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -216,32 +218,17 @@ function App() {
   };
 
   const handleGenerateContent = async () => {
-    if (!content.brandDescription) {
-      showToast('Please enter a brand description first', 'error');
-      return;
-    }
-
     setAiLoading(true);
-    showToast('Starting AI content generation...', 'warning');
-    
+    setError(null);
+
     try {
-      console.log('Starting content generation...');
-      const brandData: BrandFetchResponse = {
+      const generatedContent = await generateMarketingContent({
         name: content.brandName,
         domain: '',
         logo: content.logoUrl,
-        description: content.brandDescription,
-        longDescription: content.brandDescription,
-        colors: {
-          primary: '',
-          all: []
-        }
-      };
+        description: content.brandDescription
+      }, content.contentType);
 
-      console.log('Sending request with brand data:', brandData);
-      const generatedContent = await generateMarketingContent(brandData);
-      console.log('Received generated content:', generatedContent);
-      
       setContent(prev => ({
         ...prev,
         ...generatedContent
@@ -249,10 +236,10 @@ function App() {
 
       setHasGeneratedContent(true);
       analytics.trackGenerateClick();
-      showToast('Marketing content generated successfully!', 'success');
     } catch (error) {
-      console.error('AI content generation error:', error);
+      console.error('Error generating content:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate content';
+      setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
       setAiLoading(false);
@@ -389,7 +376,28 @@ function App() {
                     placeholder="Enter brand description..."
                   />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-3 items-end">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Content Type</label>
+                    <div className="relative">
+                      <select
+                        value={content.contentType}
+                        onChange={(e) => handleInputChange('contentType', e.target.value as ContentType)}
+                        className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm bg-white pr-10 py-2 appearance-none cursor-pointer hover:border-gray-300 transition-colors"
+                      >
+                        <option value="General Marketing">General Marketing</option>
+                        <option value="Retention">Retention</option>
+                        <option value="Loyalty">Loyalty</option>
+                        <option value="Transactional">Transactional</option>
+                        <option value="Onboarding">Onboarding</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={handleGenerateContent}
                     disabled={aiLoading || !content.brandDescription}
