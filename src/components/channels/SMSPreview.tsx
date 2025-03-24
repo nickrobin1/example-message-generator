@@ -46,7 +46,7 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
                 </div>
               )}
               <div className="mt-1 flex items-center gap-1">
-                <span className="text-gray-900 text-base font-medium font-['SF_Pro_Text']">
+                <span className="text-gray-900 text-base font-medium ios-font">
                   {content.brandName || 'Brand Name'}
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -61,11 +61,11 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
           <div className="flex items-end gap-2">
             <div className="max-w-[80%]">
               <div className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm px-4 py-2">
-                <p className="text-black text-[15px] leading-5 font-['SF_Pro_Text']">
+                <p className="text-black text-[15px] leading-5 ios-font">
                   {content.smsMessage || 'Your message will appear here'}
                 </p>
               </div>
-              <div className="text-[11px] text-gray-500 mt-1 ml-2 font-['SF_Pro_Text']">
+              <div className="text-[11px] text-gray-500 mt-1 ml-2 ios-font">
                 {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
               </div>
             </div>
@@ -76,11 +76,11 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
             <div className="flex items-end justify-end gap-2">
               <div className="max-w-[80%]">
                 <div className="bg-[#007AFF] rounded-2xl rounded-tr-sm px-4 py-2">
-                  <p className="text-white text-[15px] leading-5 font-['SF_Pro_Text']">
+                  <p className="text-white text-[15px] leading-5 ios-font">
                     {content.userReply}
                   </p>
                 </div>
-                <div className="text-[11px] text-gray-500 mt-1 mr-2 text-right font-['SF_Pro_Text']">
+                <div className="text-[11px] text-gray-500 mt-1 mr-2 text-right ios-font">
                   {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                 </div>
               </div>
@@ -92,11 +92,11 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
             <div className="flex items-end gap-2">
               <div className="max-w-[80%]">
                 <div className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm px-4 py-2">
-                  <p className="text-black text-[15px] leading-5 font-['SF_Pro_Text']">
+                  <p className="text-black text-[15px] leading-5 ios-font">
                     {content.brandReply}
                   </p>
                 </div>
-                <div className="text-[11px] text-gray-500 mt-1 ml-2 font-['SF_Pro_Text']">
+                <div className="text-[11px] text-gray-500 mt-1 ml-2 ios-font">
                   {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                 </div>
               </div>

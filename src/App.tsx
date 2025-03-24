@@ -480,13 +480,13 @@ function App() {
                     alt="9:41"
                     className="w-[72px] mx-auto"
                   />
-                  <div className="text-[22px] font-normal mt-1 font-['SF_Pro_Display']">Monday, June 3</div>
+                  <div className="text-[22px] font-normal mt-1 ios-display">Monday, June 3</div>
                 </div>
 
                 {/* iOS Notification */}
                 <div className="absolute inset-x-4 top-[180px]">
                   <div 
-                    className="w-full rounded-[12px] p-4 font-['SF_Pro_Text']"
+                    className="w-full rounded-[12px] p-4 ios-font"
                     style={{ 
                       background: 'rgba(245, 245, 245, 0.3)',
                       backdropFilter: 'blur(25px)',
@@ -508,13 +508,13 @@ function App() {
                           </div>
                         )}
                         <div className="flex flex-col gap-1">
-                          <span className="text-[15px] font-semibold leading-none font-['SF_Pro_Text']">{content.brandName}</span>
-                          <p className="text-[14px] leading-[1.2] text-black font-['SF_Pro_Text']">
+                          <span className="text-[15px] font-semibold leading-none">{content.brandName}</span>
+                          <p className="text-[14px] leading-[1.2] text-black">
                             {content.pushMessage}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[12px] text-black font-['SF_Pro_Text'] whitespace-nowrap">34m ago</span>
+                      <span className="text-[12px] text-black whitespace-nowrap">34m ago</span>
                     </div>
                   </div>
                 </div>
@@ -525,7 +525,7 @@ function App() {
                     <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
                     <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
                   </div>
-                  <div className="text-white/60 text-sm font-['SF_Pro_Text']">swipe up to open</div>
+                  <div className="text-white/60 text-sm ios-font mt-4">swipe up to open</div>
                   <div className="w-32 h-1 bg-white rounded-full mt-2" />
                 </div>
               </div>

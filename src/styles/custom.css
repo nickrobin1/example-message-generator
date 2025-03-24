@@ -4,4 +4,20 @@
   --secondary-color: #6c757d;
 }
 
+/* iOS System Font Stack */
+.ios-font {
+  font-family: -apple-system, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', system-ui, -system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* iOS Display Font Stack */
+.ios-display {
+  font-family: -apple-system, 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', system-ui, -system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 /* Add custom styles below */ 
