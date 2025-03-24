@@ -83,7 +83,9 @@ export const handler: Handler = async (event) => {
     };
 
     const response = await openai.chat.completions.create({
+      // cursor:skip
       model: 'gpt-4o-mini',
+      // cursor:endskip
       messages: [
         {
           role: 'system',
