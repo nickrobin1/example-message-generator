@@ -90,7 +90,17 @@ function App() {
   }, [content.brandDescription, shouldGenerateContent]);
 
   const handleInputChange = (field: keyof MarketingContent, value: string | string[]) => {
-    setContent(prev => ({ ...prev, [field]: value }));
+    setContent(prev => {
+      const updates = { [field]: value };
+      
+      // If logo URL is changed, update SMS and Push icons as well
+      if (field === 'logoUrl') {
+        updates.smsIcon = value;
+        updates.pushIcon = value;
+      }
+      
+      return { ...prev, ...updates };
+    });
   };
 
   // Function to sanitize domain before API call
@@ -483,7 +493,7 @@ function App() {
                 {/* iOS Notification */}
                 <div className="absolute inset-x-4 top-[180px]">
                   <div 
-                    className="w-full rounded-[12px] p-4 ios-font"
+                    className="w-full rounded-[16px] p-[14px] ios-font"
                     style={{ 
                       background: 'rgba(245, 245, 245, 0.3)',
                       backdropFilter: 'blur(25px)',
@@ -491,27 +501,29 @@ function App() {
                       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                     }}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
                         {content.logoUrl ? (
-                          <img 
-                            src={content.logoUrl} 
-                            alt={content.brandName}
-                            className="w-[40px] h-[40px] rounded-[8px] object-cover"
-                          />
+                          <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
+                            <img 
+                              src={content.logoUrl} 
+                              alt={content.brandName}
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          </div>
                         ) : (
-                          <div className="w-[40px] h-[40px] rounded-[8px] bg-gray-100 flex items-center justify-center">
+                          <div className="w-[48px] h-[48px] rounded-[12px] bg-gray-100 flex items-center justify-center flex-shrink-0">
                             <Building2 className="w-6 h-6 text-gray-400" />
                           </div>
                         )}
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 flex-1 min-w-0">
                           <span className="text-[15px] font-semibold leading-none">{content.brandName || '{{Brand Name}}'}</span>
-                          <p className="text-[14px] leading-[1.2] text-black">
+                          <p className="text-[15px] leading-[1.2] text-black">
                             {content.pushMessage || 'Your message will appear here'}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[12px] text-black whitespace-nowrap">34m ago</span>
+                      <span className="text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
                     </div>
                   </div>
                 </div>

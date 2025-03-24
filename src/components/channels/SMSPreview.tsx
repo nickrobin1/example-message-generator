@@ -33,11 +33,11 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
             </button>
             <div className="flex-1 flex flex-col items-center">
               {content.smsIcon ? (
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center p-2">
                   <img 
                     src={content.smsIcon} 
                     alt={content.brandName}
-                    className="w-full h-full object-cover"
+                    className="max-w-full max-h-full object-contain"
                   />
                 </div>
               ) : (
