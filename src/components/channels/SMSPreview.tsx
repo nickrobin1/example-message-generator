@@ -1,48 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Building2, ChevronLeft, ChevronRight, Battery, Signal, Wifi } from 'lucide-react';
 import type { MarketingContent } from '../../types';
-import ColorThief from 'colorthief';
 
 export default function SMSPreview({ content }: { content: MarketingContent }) {
-  const [primaryColor, setPrimaryColor] = useState<string>('#F2F2F7'); // Default to header background color
-
-  useEffect(() => {
-    if (content.smsIcon) {
-      const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.src = content.smsIcon;
-      
-      img.onload = () => {
-        const colorThief = new ColorThief();
-        try {
-          const [r, g, b] = colorThief.getColor(img);
-          setPrimaryColor(`rgb(${r}, ${g}, ${b})`);
-        } catch (error) {
-          console.error('Error extracting color:', error);
-          setPrimaryColor('#F2F2F7'); // Fallback to header background color
-        }
-      };
-
-      img.onerror = () => {
-        console.error('Error loading image for color extraction');
-        setPrimaryColor('#F2F2F7'); // Fallback to header background color
-      };
-    }
-  }, [content.smsIcon]);
-
-  // Get current date in iOS format
-  const now = new Date();
-  const formattedDate = now.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
-  const formattedTime = now.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
@@ -73,14 +33,11 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
             </button>
             <div className="flex-1 flex flex-col items-center">
               {content.smsIcon ? (
-                <div 
-                  className="w-12 h-12 rounded-full overflow-hidden"
-                  style={{ backgroundColor: primaryColor }}
-                >
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
                   <img 
                     src={content.smsIcon} 
                     alt={content.brandName}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
@@ -99,38 +56,50 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
         </div>
 
         {/* Messages Container */}
-        <div className="flex-1 p-4 bg-white">
-          {/* Timestamp */}
-          <div className="text-center mb-4">
-            <span className="text-gray-500 text-sm font-['SF_Pro_Text']">
-              {formattedDate} {formattedTime}
-            </span>
-          </div>
-
+        <div className="flex-1 p-4 space-y-4 bg-white overflow-y-auto">
           {/* Initial Message Bubble */}
-          <div className="max-w-[85%] bg-[#E9E9EB] rounded-3xl px-4 py-2 mb-4">
-            <p className="text-black text-base font-['SF_Pro_Text']">
-              {content.smsMessage || 'Your message will appear here'}
-            </p>
+          <div className="flex items-end gap-2">
+            <div className="max-w-[80%]">
+              <div className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm px-4 py-2">
+                <p className="text-black text-[15px] leading-5 font-['SF_Pro_Text']">
+                  {content.smsMessage || 'Your message will appear here'}
+                </p>
+              </div>
+              <div className="text-[11px] text-gray-500 mt-1 ml-2 font-['SF_Pro_Text']">
+                {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+              </div>
+            </div>
           </div>
 
           {/* User Reply */}
           {content.userReply && (
-            <div className="flex justify-end mb-4">
-              <div className="max-w-[85%] bg-[#007AFF] rounded-3xl px-4 py-2">
-                <p className="text-white text-base font-['SF_Pro_Text']">
-                  {content.userReply}
-                </p>
+            <div className="flex items-end justify-end gap-2">
+              <div className="max-w-[80%]">
+                <div className="bg-[#007AFF] rounded-2xl rounded-tr-sm px-4 py-2">
+                  <p className="text-white text-[15px] leading-5 font-['SF_Pro_Text']">
+                    {content.userReply}
+                  </p>
+                </div>
+                <div className="text-[11px] text-gray-500 mt-1 mr-2 text-right font-['SF_Pro_Text']">
+                  {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                </div>
               </div>
             </div>
           )}
 
           {/* Brand Reply */}
           {content.userReply && content.brandReply && (
-            <div className="max-w-[85%] bg-[#E9E9EB] rounded-3xl px-4 py-2">
-              <p className="text-black text-base font-['SF_Pro_Text']">
-                {content.brandReply}
-              </p>
+            <div className="flex items-end gap-2">
+              <div className="max-w-[80%]">
+                <div className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm px-4 py-2">
+                  <p className="text-black text-[15px] leading-5 font-['SF_Pro_Text']">
+                    {content.brandReply}
+                  </p>
+                </div>
+                <div className="text-[11px] text-gray-500 mt-1 ml-2 font-['SF_Pro_Text']">
+                  {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                </div>
+              </div>
             </div>
           )}
         </div>

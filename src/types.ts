@@ -10,7 +10,6 @@ export interface MarketingContent {
   smsIcon: string;
 
   // Push
-  pushTitle: string;
   pushMessage: string;
   pushIcon: string;
 
@@ -57,7 +56,6 @@ export interface BrandFetchResponse {
 
 export interface AIGeneratedContent {
   smsMessage: string;
-  pushTitle: string;
   pushMessage: string;
   cardTitle: string;
   cardDescription: string;

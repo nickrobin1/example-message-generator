@@ -22,17 +22,20 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
         pixelRatio: 2,
       });
       
-      const brandName = content.brandName?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'brand';
-      const channel = title.toLowerCase().replace(/\s+preview$/, '');
-      const filename = `${brandName}-${channel}-preview.png`;
+      const brandName = content.brandName
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, '') || 'brand';
       
+      const channel = title.toLowerCase().replace(/\s+preview$/, '');
+      
+      const filename = `${brandName}-${channel}-preview.png`;
+
       const link = document.createElement('a');
       link.download = filename;
       link.href = dataUrl;
       link.click();
 
-      // Track the export event
-      analytics.trackExportClick(title.toLowerCase());
+      analytics.trackExportClick(channel);
     } catch (error) {
       console.error('Error generating preview:', error);
     }

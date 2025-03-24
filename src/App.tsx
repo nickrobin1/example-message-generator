@@ -42,33 +42,32 @@ function App() {
     logoUrl: '',
     brandDescription: '',
     brandColor: '#3D1D72',
-    smsMessage: 'Hey {{first_name}}! We noticed you left {{item}} in your cart. Use code SAVE20 for 20% off your first order. Shop now!',
+    smsMessage: 'Your message will appear here',
     smsIcon: '',
-    pushTitle: '🎉 {{Brand Name}} Flash Sale Alert!',
-    pushMessage: 'Don\'t miss out! {{item}} is back in stock. Tap to shop now.',
+    pushMessage: 'Your message will appear here',
     pushIcon: '',
-    cardTitle: '{{Brand Name}} Summer Collection Launch',
-    cardDescription: 'Discover {{item}} and more in our newest collection. Limited time offers available.',
-    cardImage: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80',
-    emailSubject: '{{first_name}}, your exclusive preview: New {{Brand Name}} Collection',
-    emailHeadline: 'Be the first to shop {{Brand Name}}\'s new collection',
-    emailBody: 'Hi {{first_name}}! We\'re excited to share our latest collection with you. As a valued customer, you get early access to {{item}} and more. Shop now and enjoy 20% off your first purchase with code SUMMER20.',
-    emailCta: 'Shop {{Brand Name}}',
+    cardTitle: 'Card Title',
+    cardDescription: 'Card description goes here',
+    cardImage: '',
+    emailSubject: '',
+    emailHeadline: '',
+    emailBody: '',
+    emailCta: '',
     emailImage: '',
     inAppType: 'modal-logo',
-    inAppTitle: 'Welcome to {{Brand Name}}',
-    inAppBody: 'Hi {{first_name}}! Get personalized recommendations and exclusive offers. Sign up to receive updates about {{item}} and more.',
-    inAppCtaText: 'Get Started with {{Brand Name}}',
+    inAppTitle: '',
+    inAppBody: '',
+    inAppCtaText: '',
     inAppImage: '',
     inAppBackgroundImage: '',
-    inAppSurveyOptions: ['Option 1', 'Option 2', 'Option 3'],
+    inAppSurveyOptions: [],
     inAppSelectedOptions: [],
     inAppSurveyType: 'single',
-    inAppInputLabel: 'Email Address',
-    inAppInputPlaceholder: 'Enter your email to get updates',
-    inAppSubmitButtonText: 'Sign Up for {{Brand Name}}',
+    inAppInputLabel: '',
+    inAppInputPlaceholder: '',
+    inAppSubmitButtonText: '',
     userReply: '',
-    brandReply: ''
+    brandReply: '',
   });
   const [shouldGenerateContent, setShouldGenerateContent] = useState(false);
 
@@ -466,7 +465,7 @@ function App() {
                 {/* iOS Notification */}
                 <div className="absolute inset-x-4 top-[180px]">
                   <div 
-                    className="w-full h-[55.36px] rounded-[9px] p-[7.18px] space-y-[7.18px] font-['SF_Pro_Text']"
+                    className="w-full rounded-[12px] p-4 font-['SF_Pro_Text']"
                     style={{ 
                       background: 'rgba(245, 245, 245, 0.3)',
                       backdropFilter: 'blur(25px)',
@@ -474,25 +473,27 @@ function App() {
                       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                     }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-[7.18px]">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
                         {content.logoUrl ? (
                           <img 
                             src={content.logoUrl} 
                             alt={content.brandName}
-                            className="w-[32px] h-[32px] rounded-[6px] object-cover"
+                            className="w-[40px] h-[40px] rounded-[8px] object-cover"
                           />
                         ) : (
-                          <div className="w-[32px] h-[32px] rounded-[6px] bg-blue-600 flex items-center justify-center">
-                            <User className="w-5 h-5 text-white" />
+                          <div className="w-[40px] h-[40px] rounded-[8px] bg-blue-600 flex items-center justify-center">
+                            <User className="w-6 h-6 text-white" />
                           </div>
                         )}
-                        <div className="flex flex-col">
-                          <span className="text-[13px] font-semibold leading-none font-['SF_Pro_Text']">{content.brandName}</span>
-                          <span className="text-[11px] text-black mt-0.5 font-['SF_Pro_Text']">{content.pushTitle}</span>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[15px] font-semibold leading-none font-['SF_Pro_Text']">{content.brandName}</span>
+                          <p className="text-[14px] leading-[1.2] text-black font-['SF_Pro_Text']">
+                            {content.pushMessage}
+                          </p>
                         </div>
                       </div>
-                      <span className="text-[11px] text-black font-['SF_Pro_Text']">34m ago</span>
+                      <span className="text-[12px] text-black font-['SF_Pro_Text'] whitespace-nowrap">34m ago</span>
                     </div>
                   </div>
                 </div>
