@@ -35,39 +35,42 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   const [domainInput, setDomainInput] = useState('');
   const [content, setContent] = useState<MarketingContent>({
-    brandName: 'Your Brand',
+    brandName: '',
     logoUrl: '',
     brandDescription: '',
-    smsMessage: 'Welcome! Use code WELCOME20 for 20% off your first purchase.',
-    pushTitle: 'Special Offer Inside! 🎉',
-    pushMessage: 'Don\'t miss out on our latest collection. Tap to explore now!',
-    cardTitle: 'Summer Collection Launch',
-    cardDescription: 'Discover our newest arrivals perfect for the summer season. Limited time offers available.',
+    brandColor: '#3D1D72',
+    smsMessage: 'Hey {{first_name}}! We noticed you left {{item}} in your cart. Use code SAVE20 for 20% off your first order. Shop now!',
+    smsIcon: '',
+    pushTitle: '🎉 {{Brand Name}} Flash Sale Alert!',
+    pushMessage: 'Don\'t miss out! {{item}} is back in stock. Tap to shop now.',
+    pushIcon: '',
+    cardTitle: '{{Brand Name}} Summer Collection Launch',
+    cardDescription: 'Discover {{item}} and more in our newest collection. Limited time offers available.',
     cardImage: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80',
-    userReply: '',
-    brandReply: '',
+    emailSubject: '{{first_name}}, your exclusive preview: New {{Brand Name}} Collection',
+    emailHeadline: 'Be the first to shop {{Brand Name}}\'s new collection',
+    emailBody: 'Hi {{first_name}}! We\'re excited to share our latest collection with you. As a valued customer, you get early access to {{item}} and more. Shop now and enjoy 20% off your first purchase with code SUMMER20.',
+    emailCta: 'Shop {{Brand Name}}',
+    emailImage: '',
     inAppType: 'modal-logo',
-    inAppTitle: 'Welcome to Your Brand',
-    inAppBody: 'Discover our latest collection and get 20% off your first purchase.',
+    inAppTitle: 'Welcome to {{Brand Name}}',
+    inAppBody: 'Hi {{first_name}}! Get personalized recommendations and exclusive offers. Sign up to receive updates about {{item}} and more.',
+    inAppCtaText: 'Get Started with {{Brand Name}}',
     inAppImage: '',
-    inAppCtaText: 'Shop Now',
-    inAppSurveyOptions: ['', '', '', ''],
+    inAppBackgroundImage: '',
+    inAppSurveyOptions: ['Option 1', 'Option 2', 'Option 3'],
     inAppSelectedOptions: [],
     inAppSurveyType: 'single',
-    inAppBackgroundImage: '',
-    smsIcon: '',
-    pushIcon: '',
     inAppInputLabel: 'Email Address',
     inAppInputPlaceholder: 'Enter your email to get updates',
-    inAppSubmitButtonText: 'Sign Up',
-    emailSubject: '',
-    emailHeadline: '',
-    emailBody: '',
-    emailCta: '',
-    emailImage: '',
+    inAppSubmitButtonText: 'Sign Up for {{Brand Name}}',
+    userReply: '',
+    brandReply: ''
   });
+  const [shouldGenerateContent, setShouldGenerateContent] = useState(false);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -76,6 +79,13 @@ function App() {
       localStorage.setItem('hasSeenWelcome', 'true');
     }
   }, []);
+
+  useEffect(() => {
+    if (shouldGenerateContent && content.brandDescription) {
+      handleGenerateContent();
+      setShouldGenerateContent(false);
+    }
+  }, [content.brandDescription, shouldGenerateContent]);
 
   const handleInputChange = (field: keyof MarketingContent, value: string | string[]) => {
     setContent(prev => ({ ...prev, [field]: value }));
@@ -102,7 +112,7 @@ function App() {
     }
   };
 
-  const showToast = (message: string, type: 'success' | 'error') => {
+  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
     toast.custom(
       (t) => (
         <div
@@ -114,7 +124,9 @@ function App() {
             <div className="flex items-start">
               <div className="ml-3 flex-1">
                 <p className={`text-sm font-medium ${
-                  type === 'error' ? 'text-red-600' : 'text-green-600'
+                  type === 'error' ? 'text-red-600' : 
+                  type === 'warning' ? 'text-yellow-600' : 
+                  'text-green-600'
                 }`}>
                   {message}
                 </p>
@@ -158,6 +170,7 @@ function App() {
       }));
 
       showToast('Brand information updated successfully!', 'success');
+      setShouldGenerateContent(true);
       return;
     }
 
@@ -194,6 +207,7 @@ function App() {
       }));
 
       showToast('Brand information updated successfully!', 'success');
+      setShouldGenerateContent(true);
     } catch (error) {
       console.error('Brand lookup error:', error);
       showToast('We were unable to lookup brand, please insert the brand info manually.', 'error');
@@ -209,6 +223,8 @@ function App() {
     }
 
     setAiLoading(true);
+    showToast('Starting AI content generation...', 'warning');
+    
     try {
       console.log('Starting content generation...');
       const brandData: BrandFetchResponse = {
@@ -232,6 +248,7 @@ function App() {
         ...generatedContent
       }));
 
+      setHasGeneratedContent(true);
       analytics.trackGenerateClick();
       showToast('Marketing content generated successfully!', 'success');
     } catch (error) {
@@ -368,11 +385,16 @@ function App() {
                   className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#3D1D72] hover:bg-[#2D1655] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {aiLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Generating Content
+                    </>
                   ) : (
-                    <Wand2 className="w-5 h-5 mr-2" />
+                    <>
+                      <Wand2 className="w-5 h-5 mr-2" />
+                      {hasGeneratedContent ? 'Regenerate Content' : 'Generate Content'}
+                    </>
                   )}
-                  Generate Content
                 </button>
               </div>
             </div>
@@ -410,11 +432,18 @@ function App() {
           {activeChannel === 'push' && (
             <DeviceFrame title="Push Notification Preview">
               <div className="relative h-full">
-                {/* Wallpaper Background */}
-                <img 
-                  src={wallpaperImage} 
-                  alt="iOS Wallpaper" 
-                  className="absolute inset-0 w-full h-full object-cover"
+                {/* Gradient Background */}
+                <div 
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    background: `
+                      radial-gradient(circle at 70% 20%, #FF6B00 0%, transparent 50%),
+                      radial-gradient(circle at 20% 40%, #FFD600 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, #FF4D6B 0%, transparent 50%),
+                      radial-gradient(circle at 40% 90%, #FF2D87 0%, transparent 50%),
+                      linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%)
+                    `
+                  }}
                 />
 
                 {/* Lock Icon */}
