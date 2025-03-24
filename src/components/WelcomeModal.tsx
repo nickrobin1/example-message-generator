@@ -26,9 +26,10 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           <p className="font-medium">Getting Started:</p>
           
           <ul className="list-disc pl-5 space-y-2">
-            <li>Simply enter a domain name to automatically fetch brand assets</li>
+            <li>Simply enter a domain name and we'll try to automatically fetch info about that brand</li>
             <li>Or manually customize your brand details if you prefer</li>
-            <li>Preview messages across all channels: SMS, Push, Cards, and In-App</li>
+            <li>Preview messages across all channels: SMS, Push, Email, Cards, and In-App</li>
+            <li>Generate AI-powered content with just one click</li>
           </ul>
           
           <p>
@@ -47,6 +48,10 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
             </a>
             .
           </p>
+
+          <div className="pt-4 border-t mt-4 text-center text-sm text-gray-500">
+            built by nick robin 🫡 happy prospecting
+          </div>
         </div>
       </div>
     </div>
