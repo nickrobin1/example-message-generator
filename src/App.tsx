@@ -27,6 +27,7 @@ import { analytics } from './lib/analytics';
 import EmailEditor from './components/channels/EmailEditor';
 import EmailPreview from './components/channels/EmailPreview';
 import ImageInput from './components/ImageInput';
+import ColorPicker from './components/ColorPicker';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -181,6 +182,7 @@ function App() {
         smsIcon: seedData.logo,
         pushIcon: seedData.logo,
         brandDescription: seedData.longDescription,
+        brandColor: seedData.colors?.primary || '#3D1D72',
       }));
 
       showToast('Brand information updated successfully!', 'success');
@@ -231,6 +233,7 @@ function App() {
         smsIcon: data.logo || prev.smsIcon,
         pushIcon: data.logo || prev.pushIcon,
         brandDescription: description,
+        brandColor: data.colors?.primary || prev.brandColor,
       }));
 
       showToast('Brand information updated successfully!', 'success');
@@ -399,6 +402,11 @@ function App() {
                   onChange={(value) => handleInputChange('logoUrl', value)}
                   label="Logo"
                   placeholder="https://example.com/logo.png"
+                />
+                <ColorPicker
+                  color={content.brandColor}
+                  onChange={(color) => handleInputChange('brandColor', color)}
+                  label="Brand Color"
                 />
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">Brand Description</label>

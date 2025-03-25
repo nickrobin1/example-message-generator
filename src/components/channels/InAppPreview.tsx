@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
-import ColorThief from 'colorthief';
 import { MarketingContent } from '../../types';
 
 interface InAppPreviewProps {
@@ -9,32 +8,6 @@ interface InAppPreviewProps {
 }
 
 const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange }) => {
-  const [primaryColor, setPrimaryColor] = useState<string>('#7C3AED'); // Default purple
-
-  useEffect(() => {
-    if (content.logoUrl) {
-      const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.src = content.logoUrl;
-      
-      img.onload = () => {
-        const colorThief = new ColorThief();
-        try {
-          const [r, g, b] = colorThief.getColor(img);
-          setPrimaryColor(`rgb(${r}, ${g}, ${b})`);
-        } catch (error) {
-          console.error('Error extracting color:', error);
-          setPrimaryColor('#7C3AED'); // Fallback to default purple
-        }
-      };
-
-      img.onerror = () => {
-        console.error('Error loading image for color extraction');
-        setPrimaryColor('#7C3AED'); // Fallback to default purple
-      };
-    }
-  }, [content.logoUrl]);
-
   const renderContent = () => {
     switch (content.inAppType) {
       case 'modal-logo':
@@ -60,7 +33,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
                 <p className="text-gray-600 text-center text-sm mb-4">{content.inAppBody || 'We\'re excited to have you here! Get started by exploring our features.'}</p>
                 <button 
                   className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
-                  style={{ backgroundColor: primaryColor }}
+                  style={{ backgroundColor: content.brandColor }}
                 >
                   {content.inAppCtaText || 'Get Started'}
                 </button>
@@ -86,7 +59,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
                 <p className="text-gray-600 text-sm mb-4">{content.inAppBody || 'We\'re excited to have you here! Get started by exploring our features.'}</p>
                 <button 
                   className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
-                  style={{ backgroundColor: primaryColor }}
+                  style={{ backgroundColor: content.brandColor }}
                 >
                   {content.inAppCtaText || 'Get Started'}
                 </button>
@@ -114,7 +87,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
                 <p className="text-gray-600 text-sm mb-4 flex-1">{content.inAppBody || 'We\'re excited to have you here! Get started by exploring our features.'}</p>
                 <button 
                   className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
-                  style={{ backgroundColor: primaryColor }}
+                  style={{ backgroundColor: content.brandColor }}
                 >
                   {content.inAppCtaText || 'Get Started'}
                 </button>
@@ -159,7 +132,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
                 </div>
                 <button 
                   className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
-                  style={{ backgroundColor: primaryColor }}
+                  style={{ backgroundColor: content.brandColor }}
                 >
                   {content.inAppCtaText || 'Submit'}
                 </button>
@@ -202,7 +175,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
                   </div>
                   <button 
                     className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
-                    style={{ backgroundColor: primaryColor }}
+                    style={{ backgroundColor: content.brandColor }}
                   >
                     {content.inAppCtaText || 'Submit'}
                   </button>
