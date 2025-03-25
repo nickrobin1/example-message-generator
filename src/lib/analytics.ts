@@ -7,6 +7,7 @@ export type AnalyticsEvent =
   | 'export_click'
   | 'copy_click'
   | 'feedback_submit'
+  | 'error_occurred'
 
 // Helper function to check if PostHog is available
 const isPostHogAvailable = () => {
@@ -88,6 +89,26 @@ export const analytics = {
       console.log('Tracked copy click:', channel);
     } catch (error) {
       console.error('Failed to track copy click:', error);
+    }
+  },
+
+  // Error tracking event
+  trackError: (errorType: string, errorMessage: string, context?: Record<string, any>) => {
+    try {
+      if (!isPostHogAvailable()) {
+        console.warn('PostHog not available, skipping error tracking');
+        return;
+      }
+
+      posthog.capture('error_occurred', {
+        error_type: errorType,
+        error_message: errorMessage,
+        context,
+        timestamp: new Date().toISOString()
+      });
+      console.log('Tracked error:', { errorType, errorMessage, context });
+    } catch (error) {
+      console.error('Failed to track error:', error);
     }
   },
 

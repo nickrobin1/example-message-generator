@@ -191,6 +191,7 @@ function App() {
       const sanitizedDomain = sanitizeDomain(domain);
       const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(sanitizedDomain)}`;
       const response = await fetch(requestUrl);
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to fetch brand information');
@@ -199,13 +200,25 @@ function App() {
       const data: BrandFetchResponse = await response.json();
       
       if (!data.name && !data.logo) {
-        showToast('No brand information found. Please enter details manually.', 'error');
+        const errorMessage = 'No brand information found. Please enter details manually.';
+        showToast(errorMessage, 'error');
+        analytics.trackError('brand_lookup_failed', errorMessage, {
+          domain,
+          reason: 'no_brand_info',
+          response: data
+        });
         return;
       }
 
       const description = data.longDescription || data.description;
       if (!description) {
-        showToast('No brand description found. Please enter details manually.', 'error');
+        const errorMessage = 'No brand description found. Please enter details manually.';
+        showToast(errorMessage, 'error');
+        analytics.trackError('brand_lookup_failed', errorMessage, {
+          domain,
+          reason: 'no_description',
+          response: data
+        });
         return;
       }
 
@@ -221,8 +234,14 @@ function App() {
       showToast('Brand information updated successfully!', 'success');
       setShouldGenerateContent(true);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch brand information';
       console.error('Brand lookup error:', error);
       showToast('We were unable to lookup brand, please insert the brand info manually.', 'error');
+      analytics.trackError('brand_lookup_failed', errorMessage, {
+        domain,
+        reason: 'api_error',
+        status: error instanceof Error && 'status' in error ? error.status : undefined
+      });
     } finally {
       setLoading(false);
     }
@@ -252,6 +271,12 @@ function App() {
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate content';
       setError(errorMessage);
       showToast(errorMessage, 'error');
+      analytics.trackError('content_generation_failed', errorMessage, {
+        brandName: content.brandName,
+        contentType: content.contentType,
+        hasDescription: !!content.brandDescription,
+        descriptionLength: content.brandDescription.length
+      });
     } finally {
       setAiLoading(false);
     }

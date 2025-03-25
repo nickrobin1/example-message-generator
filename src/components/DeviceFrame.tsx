@@ -38,7 +38,12 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
 
       analytics.trackExportClick(channel);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error generating preview:', error);
+      analytics.trackError('download_preview_failed', errorMessage, {
+        channel: title.toLowerCase().replace(/\s+preview$/, ''),
+        brandName: content.brandName
+      });
     }
   };
 
@@ -71,7 +76,14 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
         setIsCopying(false);
       }, 1000);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error copying preview:', error);
+      analytics.trackError('copy_preview_failed', errorMessage, {
+        channel: title.toLowerCase().replace(/\s+preview$/, ''),
+        brandName: content.brandName,
+        clipboardSupported: !!navigator.clipboard,
+        clipboardWriteSupported: !!(navigator.clipboard && navigator.clipboard.write)
+      });
       setIsCopying(false);
     }
   };
