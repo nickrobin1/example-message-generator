@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Video, User, Building2, MessageCircle, Search, Wand2, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
+import { PostHogProvider } from 'posthog-js/react';
+import { posthog } from './lib/posthog';
 import DeviceFrame from './components/DeviceFrame';
 import ChannelToggle from './components/ChannelToggle';
 import SMSEditor from './components/channels/SMSEditor';
@@ -631,4 +633,11 @@ function App() {
   );
 }
 
-export default App;
+// Wrap the App component with PostHogProvider
+export default function AppWithProviders() {
+  return (
+    <PostHogProvider client={posthog}>
+      <App />
+    </PostHogProvider>
+  );
+}
