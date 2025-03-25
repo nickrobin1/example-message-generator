@@ -351,7 +351,7 @@ function App() {
                     type="text"
                     value={domainInput}
                     onChange={(e) => setDomainInput(e.target.value)}
-                    placeholder="e.g adidas.com"
+                    placeholder="e.g uniqlo.com"
                     className="w-full pl-4 pr-12 py-3 rounded-full border-gray-200 focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm shadow-sm"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
