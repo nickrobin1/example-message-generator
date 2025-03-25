@@ -40,36 +40,37 @@ function App() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   const [domainInput, setDomainInput] = useState('');
+  const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
   const [content, setContent] = useState<MarketingContent>({
     brandName: '',
     logoUrl: '',
     brandDescription: '',
     brandColor: '#3D1D72',
     contentType: 'General Marketing',
-    smsMessage: 'Your message will appear here',
+    smsMessage: 'Get 20% off your next purchase! Limited time offer. Click here to shop now.',
     smsIcon: '',
-    pushMessage: 'Your message will appear here',
+    pushMessage: "Don't miss out! Special offer just for you. Tap to learn more.",
     pushIcon: '',
-    cardTitle: 'Card Title',
-    cardDescription: 'Card description goes here',
+    cardTitle: 'Special Offer',
+    cardDescription: 'Discover our latest collection and enjoy exclusive member benefits.',
     cardImage: '',
-    emailSubject: '',
-    emailHeadline: '',
-    emailBody: '',
-    emailCta: '',
+    emailSubject: 'Welcome to Our Community',
+    emailHeadline: 'Join Us Today',
+    emailBody: 'Discover amazing products and exclusive offers tailored just for you.',
+    emailCta: 'Get Started',
     emailImage: '',
     inAppType: 'modal-logo',
-    inAppTitle: '',
-    inAppBody: '',
-    inAppCtaText: '',
+    inAppTitle: 'Welcome!',
+    inAppBody: 'Join our community and unlock exclusive benefits today.',
+    inAppCtaText: 'Get Started',
     inAppImage: '',
     inAppBackgroundImage: '',
     inAppSurveyOptions: [],
     inAppSelectedOptions: [],
     inAppSurveyType: 'single',
-    inAppInputLabel: '',
-    inAppInputPlaceholder: '',
-    inAppSubmitButtonText: '',
+    inAppInputLabel: 'Email Address',
+    inAppInputPlaceholder: 'Enter your email to get started',
+    inAppSubmitButtonText: 'Join Now',
     userReply: '',
     brandReply: '',
   });
@@ -184,6 +185,7 @@ function App() {
       }));
 
       showToast('Brand information updated successfully!', 'success');
+      setIsManualEntryOpen(true);
       setShouldGenerateContent(true);
       return;
     }
@@ -204,6 +206,7 @@ function App() {
       if (!data.name && !data.logo) {
         const errorMessage = 'No brand information found. Please enter details manually.';
         showToast(errorMessage, 'error');
+        setIsManualEntryOpen(true);
         analytics.trackError('brand_lookup_failed', errorMessage, {
           domain,
           reason: 'no_brand_info',
@@ -216,6 +219,7 @@ function App() {
       if (!description) {
         const errorMessage = 'No brand description found. Please enter details manually.';
         showToast(errorMessage, 'error');
+        setIsManualEntryOpen(true);
         analytics.trackError('brand_lookup_failed', errorMessage, {
           domain,
           reason: 'no_description',
@@ -234,11 +238,13 @@ function App() {
       }));
 
       showToast('Brand information updated successfully!', 'success');
+      setIsManualEntryOpen(true);
       setShouldGenerateContent(true);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch brand information';
       console.error('Brand lookup error:', error);
       showToast('We were unable to lookup brand, please insert the brand info manually.', 'error');
+      setIsManualEntryOpen(true);
       analytics.trackError('brand_lookup_failed', errorMessage, {
         domain,
         reason: 'api_error',
@@ -252,6 +258,7 @@ function App() {
   const handleGenerateContent = async () => {
     setAiLoading(true);
     setError(null);
+    showToast('Generating content...', 'success');
 
     try {
       const generatedContent = await generateMarketingContent({
@@ -268,6 +275,7 @@ function App() {
 
       setHasGeneratedContent(true);
       analytics.trackGenerateClick();
+      showToast('Content generated successfully!', 'success');
     } catch (error) {
       console.error('Error generating content:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate content';
@@ -333,17 +341,18 @@ function App() {
         {/* Form Section */}
         <div className="space-y-6">
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold mb-6 text-[#3D1D72]">Brand Assets</h2>
+            <h2 className="text-xl font-semibold mb-2 text-[#3D1D72]">Brand Assets</h2>
+            <p className="text-gray-400 text-sm font-light mb-6">Enter a domain name to automatically generate some example messages, or manually enter brand info below:</p>
             <div className="space-y-6">
               <div className="space-y-3">
                 <label className="block text-[15px] font-semibold text-gray-700">Auto Populate by Domain</label>
-                <div className="flex rounded-lg shadow-sm">
+                <div className="relative">
                   <input
                     type="text"
                     value={domainInput}
                     onChange={(e) => setDomainInput(e.target.value)}
-                    placeholder="example.com"
-                    className="flex-1 rounded-l-lg border-gray-200 focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
+                    placeholder="e.g adidas.com"
+                    className="w-full pl-4 pr-12 py-3 rounded-full border-gray-200 focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm shadow-sm"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -354,103 +363,110 @@ function App() {
                   <button
                     onClick={() => handleBrandLookup(domainInput)}
                     disabled={loading}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-l-0 border-gray-200 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
                     ) : (
-                      <>
-                        <Search className="w-5 h-5" />
-                        <span>Search</span>
-                      </>
+                      <Search className="w-5 h-5" />
                     )}
                   </button>
                 </div>
               </div>
 
-              <div className="relative py-3">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-gray-200"></div>
+              <button
+                onClick={() => setIsManualEntryOpen(!isManualEntryOpen)}
+                className="w-full flex items-center justify-between py-3 text-left"
+              >
+                <div className="relative flex items-center">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-gray-200"></div>
+                  </div>
+                  <span className="relative bg-white pr-3 text-[15px] font-semibold text-gray-700">
+                    Manually Enter Brand Info
+                  </span>
                 </div>
-                <div className="relative flex justify-start">
-                  <span className="bg-white pr-3 text-[15px] font-semibold text-gray-700">Manually Enter Brand Info</span>
-                </div>
-              </div>
-
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
-                  <FakeBrandAutocomplete
-                    value={content.brandName}
-                    onChange={(value) => handleInputChange('brandName', value)}
-                    onSelectBrand={(brand) => {
-                      analytics.trackBrandLookup(brand.name);
-                      setContent(prev => ({
-                        ...prev,
-                        brandName: brand.name,
-                        logoUrl: `/src/assets/Fake Brands/${brand.image}`,
-                        brandDescription: brand.description
-                      }));
-                    }}
-                  />
-                </div>
-                <ImageInput
-                  value={content.logoUrl}
-                  onChange={(value) => handleInputChange('logoUrl', value)}
-                  label="Logo"
-                  placeholder="https://example.com/logo.png"
+                <ChevronLeft 
+                  className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isManualEntryOpen ? 'rotate-90' : '-rotate-90'}`} 
                 />
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">Brand Description</label>
-                  <textarea
-                    value={content.brandDescription}
-                    onChange={(e) => handleInputChange('brandDescription', e.target.value)}
-                    className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
-                    rows={3}
-                    placeholder="Enter brand description..."
+              </button>
+
+              {isManualEntryOpen && (
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
+                    <FakeBrandAutocomplete
+                      value={content.brandName}
+                      onChange={(value) => handleInputChange('brandName', value)}
+                      onSelectBrand={(brand) => {
+                        analytics.trackBrandLookup(brand.name);
+                        setContent(prev => ({
+                          ...prev,
+                          brandName: brand.name,
+                          logoUrl: `/src/assets/Fake Brands/${brand.image}`,
+                          brandDescription: brand.description
+                        }));
+                      }}
+                    />
+                  </div>
+                  <ImageInput
+                    value={content.logoUrl}
+                    onChange={(value) => handleInputChange('logoUrl', value)}
+                    label="Logo"
+                    placeholder="https://example.com/logo.png"
                   />
-                </div>
-                <div className="flex justify-end gap-3 items-end">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Content Type</label>
-                    <div className="relative">
-                      <select
-                        value={content.contentType}
-                        onChange={(e) => handleInputChange('contentType', e.target.value as ContentType)}
-                        className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm bg-white pr-10 py-2 appearance-none cursor-pointer hover:border-gray-300 transition-colors"
-                      >
-                        <option value="General Marketing">General Marketing</option>
-                        <option value="Retention">Retention</option>
-                        <option value="Loyalty">Loyalty</option>
-                        <option value="Transactional">Transactional</option>
-                        <option value="Onboarding">Onboarding</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
-                        <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Brand Description</label>
+                    <textarea
+                      value={content.brandDescription}
+                      onChange={(e) => handleInputChange('brandDescription', e.target.value)}
+                      className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
+                      rows={3}
+                      placeholder="Enter brand description..."
+                    />
+                  </div>
+                  <div className="flex justify-end gap-3 items-end">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Content Type</label>
+                      <div className="relative">
+                        <select
+                          value={content.contentType}
+                          onChange={(e) => handleInputChange('contentType', e.target.value as ContentType)}
+                          className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm bg-white pr-10 py-2 appearance-none cursor-pointer hover:border-gray-300 transition-colors"
+                        >
+                          <option value="General Marketing">General Marketing</option>
+                          <option value="Retention">Retention</option>
+                          <option value="Loyalty">Loyalty</option>
+                          <option value="Transactional">Transactional</option>
+                          <option value="Onboarding">Onboarding</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                          <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
+                    <button
+                      onClick={handleGenerateContent}
+                      disabled={aiLoading || !content.brandDescription}
+                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#3D1D72] hover:bg-[#2D1655] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {aiLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Generating Content
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="w-5 h-5 mr-2" />
+                          {hasGeneratedContent ? 'Regenerate Content' : 'Generate Content'}
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <button
-                    onClick={handleGenerateContent}
-                    disabled={aiLoading || !content.brandDescription}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#3D1D72] hover:bg-[#2D1655] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {aiLoading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        Generating Content
-                      </>
-                    ) : (
-                      <>
-                        <Wand2 className="w-5 h-5 mr-2" />
-                        {hasGeneratedContent ? 'Regenerate Content' : 'Generate Content'}
-                      </>
-                    )}
-                  </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -478,13 +494,13 @@ function App() {
         {/* Preview Section */}
         <div className="space-y-8">
           {activeChannel === 'sms' && (
-            <DeviceFrame title="SMS Preview" content={content}>
+            <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">SMS Preview</h2>} content={content}>
               <SMSPreview content={content} />
             </DeviceFrame>
           )}
 
           {activeChannel === 'push' && (
-            <DeviceFrame title="Push Notification Preview" content={content}>
+            <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Push Notification Preview</h2>} content={content}>
               <div className="relative h-full">
                 {/* Gradient Background */}
                 <div 
@@ -569,13 +585,13 @@ function App() {
           )}
 
           {activeChannel === 'email' && (
-            <DeviceFrame title="Email Preview" content={content}>
+            <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Email Preview</h2>} content={content}>
               <EmailPreview content={content} />
             </DeviceFrame>
           )}
 
           {activeChannel === 'card' && (
-            <DeviceFrame title="Card Preview" content={content}>
+            <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Card Preview</h2>} content={content}>
               <div className="bg-white h-full p-4">
                 <div className="bg-white rounded-lg overflow-hidden shadow">
                   {content.cardImage ? (
@@ -604,7 +620,7 @@ function App() {
           )}
 
           {activeChannel === 'in-app' && (
-            <DeviceFrame title="In-App Preview" content={content}>
+            <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">In-App Preview</h2>} content={content}>
               <div className="bg-white h-full">
                 <InAppPreview 
                   content={content} 

@@ -7,7 +7,7 @@ import { useFeatureFlagVariantKey } from 'posthog-js/react';
 
 interface DeviceFrameProps {
   children: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
   content: MarketingContent;
 }
 
@@ -17,6 +17,14 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
   const [isHovered, setIsHovered] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const variant = useFeatureFlagVariantKey('cta-buttons');
+
+  // Extract plain text from title for analytics and filenames
+  const getPlainTitle = () => {
+    if (typeof title === 'string') return title;
+    // If it's an element, try to get the text content
+    const titleElement = title as React.ReactElement;
+    return titleElement.props?.children || 'preview';
+  };
 
   useEffect(() => {
     console.log('Feature flag "cta-buttons" value:', variant);
@@ -47,7 +55,8 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
         ?.toLowerCase()
         .replace(/[^a-z0-9]/g, '') || 'brand';
       
-      const channel = title.toLowerCase().replace(/\s+preview$/, '');
+      const plainTitle = getPlainTitle();
+      const channel = plainTitle.toLowerCase().replace(/\s+preview$/, '');
       
       const filename = `${brandName}-${channel}-preview.png`;
 
@@ -62,7 +71,7 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error generating preview:', error);
       analytics.trackError('download_preview_failed', errorMessage, {
-        channel: title.toLowerCase().replace(/\s+preview$/, ''),
+        channel: getPlainTitle().toLowerCase().replace(/\s+preview$/, ''),
         brandName: content.brandName
       });
     }
@@ -74,7 +83,7 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
       const dataUrl = await captureImage();
       if (!dataUrl) return;
 
-      const channel = title.toLowerCase().replace(/\s+preview$/, '');
+      const channel = getPlainTitle().toLowerCase().replace(/\s+preview$/, '');
       
       // Create a blob from the data URL
       const blob = await fetch(dataUrl).then(res => res.blob());
@@ -97,7 +106,7 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error copying preview:', error);
       analytics.trackError('copy_preview_failed', errorMessage, {
-        channel: title.toLowerCase().replace(/\s+preview$/, ''),
+        channel: getPlainTitle().toLowerCase().replace(/\s+preview$/, ''),
         brandName: content.brandName,
         clipboardSupported: !!navigator.clipboard,
         clipboardWriteSupported: !!(navigator.clipboard && navigator.clipboard.write)
@@ -169,7 +178,7 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
   return (
     <div className="max-w-[375px] mx-auto">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        {title}
         {variant !== 'hover' && renderButtons()}
       </div>
       <div 
