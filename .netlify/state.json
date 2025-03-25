@@ -1,7 +1,7 @@
 {
 	"geolocation": {
 		"data": {
-			"city": "Alamo",
+			"city": "Redwood City",
 			"country": {
 				"code": "US",
 				"name": "United States"
@@ -11,10 +11,10 @@
 				"name": "California"
 			},
 			"timezone": "America/Los_Angeles",
-			"latitude": 37.8567,
-			"longitude": -122.0218,
-			"postalCode": "94507"
+			"latitude": 37.5313,
+			"longitude": -122.2501,
+			"postalCode": "94065"
 		},
-		"timestamp": 1742832975683
+		"timestamp": 1742937502766
 	}
 }

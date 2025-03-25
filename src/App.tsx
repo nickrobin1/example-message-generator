@@ -27,6 +27,8 @@ import { analytics } from './lib/analytics';
 import EmailEditor from './components/channels/EmailEditor';
 import EmailPreview from './components/channels/EmailPreview';
 import ImageInput from './components/ImageInput';
+import ColorPicker from './components/ColorPicker';
+import { extractDominantColor } from './utils/color';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -92,14 +94,26 @@ function App() {
     }
   }, [content.brandDescription, shouldGenerateContent]);
 
-  const handleInputChange = (field: keyof MarketingContent, value: string | string[]) => {
+  const handleInputChange = async (field: keyof MarketingContent, value: string | string[]) => {
     setContent(prev => {
       const updates = { [field]: value };
       
-      // If logo URL is changed, update SMS and Push icons as well
+      // If logo URL is changed, update SMS and Push icons and extract brand color
       if (field === 'logoUrl') {
         updates.smsIcon = value;
         updates.pushIcon = value;
+        
+        // Extract color from the logo
+        if (typeof value === 'string' && value) {
+          extractDominantColor(value)
+            .then(color => {
+              setContent(prev => ({ ...prev, brandColor: color }));
+            })
+            .catch(error => {
+              console.error('Failed to extract color from logo:', error);
+              // Keep the default color if extraction fails
+            });
+        }
       }
       
       return { ...prev, ...updates };
@@ -182,6 +196,7 @@ function App() {
         smsIcon: seedData.logo,
         pushIcon: seedData.logo,
         brandDescription: seedData.longDescription,
+        brandColor: seedData.colors?.primary || '#3D1D72',
       }));
 
       showToast('Brand information updated successfully!', 'success');
@@ -235,7 +250,20 @@ function App() {
         smsIcon: data.logo || prev.smsIcon,
         pushIcon: data.logo || prev.pushIcon,
         brandDescription: description,
+        brandColor: data.colors?.primary || '#3D1D72',
       }));
+
+      // Extract color from the logo if we got one
+      if (data.logo) {
+        extractDominantColor(data.logo)
+          .then(color => {
+            setContent(prev => ({ ...prev, brandColor: color }));
+          })
+          .catch(error => {
+            console.error('Failed to extract color from logo:', error);
+            // Keep the color from Brand Fetch API if extraction fails
+          });
+      }
 
       showToast('Brand information updated successfully!', 'success');
       setIsManualEntryOpen(true);
@@ -404,17 +432,30 @@ function App() {
                           ...prev,
                           brandName: brand.name,
                           logoUrl: `/src/assets/Fake Brands/${brand.image}`,
-                          brandDescription: brand.description
+                          brandDescription: brand.description,
+                          brandColor: brand.colors?.primary || '#3D1D72'
                         }));
                       }}
                     />
                   </div>
-                  <ImageInput
-                    value={content.logoUrl}
-                    onChange={(value) => handleInputChange('logoUrl', value)}
-                    label="Logo"
-                    placeholder="https://example.com/logo.png"
-                  />
+                  <div className="grid grid-cols-[1fr_auto] gap-x-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Logo</label>
+                      <ImageInput
+                        value={content.logoUrl}
+                        onChange={(value) => handleInputChange('logoUrl', value)}
+                        label=""
+                        placeholder="https://example.com/logo.png"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Color</label>
+                      <ColorPicker
+                        color={content.brandColor}
+                        onChange={(color) => handleInputChange('brandColor', color)}
+                      />
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">Brand Description</label>
                     <textarea
