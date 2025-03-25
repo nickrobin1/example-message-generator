@@ -5,6 +5,7 @@ export type AnalyticsEvent =
   | 'brand_lookup'
   | 'generate_click'
   | 'export_click'
+  | 'copy_click'
   | 'feedback_submit'
 
 // Helper function to check if PostHog is available
@@ -69,6 +70,24 @@ export const analytics = {
       console.log('Tracked export click:', channel);
     } catch (error) {
       console.error('Failed to track export click:', error);
+    }
+  },
+
+  // Copy click event
+  trackCopyClick: (channel: string) => {
+    try {
+      if (!isPostHogAvailable()) {
+        console.warn('PostHog not available, skipping copy click tracking');
+        return;
+      }
+
+      posthog.capture('copy_click', {
+        channel,
+        timestamp: new Date().toISOString()
+      });
+      console.log('Tracked copy click:', channel);
+    } catch (error) {
+      console.error('Failed to track copy click:', error);
     }
   },
 
