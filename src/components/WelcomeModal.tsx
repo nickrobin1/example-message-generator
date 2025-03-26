@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -7,51 +8,69 @@ interface WelcomeModalProps {
 
 export default function WelcomeModal({ onClose }: WelcomeModalProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-lg w-full mx-4 relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl p-8 max-w-5xl w-full relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-6 right-6 text-gray-500 hover:text-gray-700 z-10"
         >
           <X className="w-6 h-6" />
         </button>
         
-        <h2 className="text-2xl font-bold text-[#3D1D72] mb-4">Welcome to the Message Preview Generator! 👋</h2>
+        <div className="flex items-center gap-3 mb-8">
+          <Wand2 className="w-8 h-8 text-[#3D1D72]" />
+          <h2 className="text-2xl font-bold text-[#3D1D72]">Welcome to the Message Preview Generator! 👋</h2>
+        </div>
         
-        <div className="space-y-4 text-gray-600">
-          <p>
-            Create beautiful message mockups in seconds with our new preview tool. This is our MVP release, and we're excited to have you try it out!
-          </p>
-          
-          <p className="font-medium">Getting Started:</p>
-          
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Simply enter a domain name and we'll try to automatically fetch info about that brand</li>
-            <li>Or manually customize your brand details if you prefer</li>
-            <li>Preview messages across all channels: SMS, Push, Email, Cards, and In-App</li>
-            <li>Generate AI-powered content with just one click</li>
-          </ul>
-          
-          <p>
-            Got ideas to make this better? Click the feedback button in the bottom right - we'd love to hear from you!
-          </p>
-          
-          <p>
-            Want to contribute to the project? Find us on{' '}
-            <a
-              href="https://github.com/nickrobin1/example-message-generator"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#3D1D72] hover:underline font-medium"
-            >
-              GitHub
-            </a>
-            .
-          </p>
-
-          <div className="pt-4 border-t mt-4 text-center text-sm text-gray-500">
-            built by nick robin 🫡 happy prospecting
+        <div className="grid grid-cols-3 gap-8">
+          {/* Step 1 */}
+          <div className="flex flex-col items-center text-center">
+            <div className="text-3xl font-bold text-[#3D1D72] mb-2">Step 1</div>
+            <p className="text-base font-medium text-gray-800 mb-3">
+              Get started by entering any brand domain address
+            </p>
+            <div className="w-full aspect-video rounded-lg shadow-lg overflow-hidden bg-gray-50">
+              <img 
+                src="/step-1.gif" 
+                alt="Step 1: Enter brand URL" 
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center text-center">
+            <div className="text-3xl font-bold text-[#3D1D72] mb-2">Step 2</div>
+            <p className="text-base font-medium text-gray-800 mb-3">
+              Brand details will be pulled in automatically, or you can customize them manually
+            </p>
+            <div className="w-full aspect-video rounded-lg shadow-lg overflow-hidden bg-gray-50">
+              <img 
+                src="/step-2.gif" 
+                alt="Step 2: Brand details and content generation" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="flex flex-col items-center text-center">
+            <div className="text-3xl font-bold text-[#3D1D72] mb-2">Step 3</div>
+            <p className="text-base font-medium text-gray-800 mb-3">
+              Example messages will automatically be generated for use in prospecting emails or client decks!
+            </p>
+            <div className="w-full aspect-video rounded-lg shadow-lg overflow-hidden bg-gray-50">
+              <img 
+                src="/step-3a.gif" 
+                alt="Step 3: Preview messages" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t mt-8 text-center text-sm text-gray-500">
+          built by nick robin 🫡 happy prospecting
         </div>
       </div>
     </div>
