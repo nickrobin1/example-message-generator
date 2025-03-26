@@ -1,6 +1,9 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Wand2 } from 'lucide-react';
+import step1Gif from '../assets/step-1.gif';
+import step2Gif from '../assets/step-2.gif';
+import step3Gif from '../assets/step-3a.gif';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -36,7 +39,7 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
             </p>
             <div className="w-full aspect-video rounded-lg shadow-lg overflow-hidden bg-gray-50">
               <img 
-                src={`${API_BASE_URL}/step-1.gif`}
+                src={step1Gif}
                 alt="Step 1: Enter brand URL" 
                 className="w-full h-full object-contain"
               />
@@ -51,7 +54,7 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
             </p>
             <div className="w-full aspect-video rounded-lg shadow-lg overflow-hidden bg-gray-50">
               <img 
-                src={`${API_BASE_URL}/step-2.gif`}
+                src={step2Gif}
                 alt="Step 2: Brand details and content generation" 
                 className="w-full h-full object-contain"
               />
@@ -66,7 +69,7 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
             </p>
             <div className="w-full aspect-video rounded-lg shadow-lg overflow-hidden bg-gray-50">
               <img 
-                src={`${API_BASE_URL}/step-3a.gif`}
+                src={step3Gif}
                 alt="Step 3: Preview messages" 
                 className="w-full h-full object-contain"
               />
