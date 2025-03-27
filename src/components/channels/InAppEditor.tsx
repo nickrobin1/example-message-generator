@@ -207,17 +207,14 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
           </>
         )}
 
-        <div className="border-t pt-4 mt-4">
+        {content.inAppType !== 'fullscreen' && (
           <ImageInput
             value={content.inAppBackgroundImage}
             onChange={(value) => onContentChange('inAppBackgroundImage', value)}
             label="App Background Image"
             placeholder="https://example.com/background-image.jpg"
           />
-          <p className="mt-2 text-sm text-gray-500">
-            Add a screenshot of your app to preview how the message will look in context
-          </p>
-        </div>
+        )}
       </div>
     </div>
   );
