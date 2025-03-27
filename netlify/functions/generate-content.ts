@@ -83,9 +83,9 @@ export const handler: Handler = async (event) => {
     };
 
     const response = await openai.chat.completions.create({
-      // cursor:skip
+      // @cursor-skip
       model: 'gpt-4o-mini',
-      // cursor:endskip
+      // @cursor-end-skip
       messages: [
         {
           role: 'system',
@@ -94,6 +94,7 @@ export const handler: Handler = async (event) => {
           
           Always respond with valid JSON in this exact format:
           {
+            "whatsappMessage": "engaging WhatsApp message with emojis",
             "smsMessage": "short message under 160 chars",
             "pushMessage": "brief push notification message",
             "cardTitle": "engaging card title",
@@ -111,6 +112,11 @@ export const handler: Handler = async (event) => {
           - Headline should be one line only
           - Body text should be 2-3 lines maximum
           - CTA should be short and action-oriented
+          
+          For WhatsApp messages:
+          - Use emojis naturally to enhance engagement
+          - Keep the tone conversational and friendly
+          - Make it feel personal and interactive
           
           Ensure all content aligns with ${contentType.toLowerCase()} messaging best practices and the brand's voice.`
         },
