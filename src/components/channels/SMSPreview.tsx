@@ -60,7 +60,7 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
           {/* Initial Message Bubble */}
           <div className="flex items-end gap-2">
             <div className="max-w-[80%]">
-              <div className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm px-4 py-2">
+              <div className="bg-[#E9E9EB] rounded-2xl rounded-bl-sm px-4 py-2">
                 <p className="text-black text-[15px] leading-5 ios-font">
                   {content.smsMessage || 'Your message will appear here'}
                 </p>
@@ -75,7 +75,7 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
           {content.userReply && (
             <div className="flex items-end justify-end gap-2">
               <div className="max-w-[80%]">
-                <div className="bg-[#007AFF] rounded-2xl rounded-tr-sm px-4 py-2">
+                <div className="bg-[#007AFF] rounded-2xl rounded-br-sm px-4 py-2">
                   <p className="text-white text-[15px] leading-5 ios-font">
                     {content.userReply}
                   </p>
@@ -91,7 +91,7 @@ export default function SMSPreview({ content }: { content: MarketingContent }) {
           {content.userReply && content.brandReply && (
             <div className="flex items-end gap-2">
               <div className="max-w-[80%]">
-                <div className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm px-4 py-2">
+                <div className="bg-[#E9E9EB] rounded-2xl rounded-bl-sm px-4 py-2">
                   <p className="text-black text-[15px] leading-5 ios-font">
                     {content.brandReply}
                   </p>
