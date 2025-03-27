@@ -46,6 +46,7 @@ export async function generateMarketingContent(
     console.log('Generated content:', data);
 
     return {
+      whatsappMessage: data.whatsappMessage,
       smsMessage: data.smsMessage,
       pushMessage: data.pushMessage,
       cardTitle: data.cardTitle,

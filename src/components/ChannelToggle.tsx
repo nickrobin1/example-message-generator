@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageCircle, Bell, Layout, Mail, LayoutDashboard } from 'lucide-react';
+import { MessageCircle, Bell, Layout, Mail, LayoutDashboard, MessageSquare } from 'lucide-react';
 
 interface ChannelToggleProps {
   value: string;
@@ -67,6 +67,18 @@ const ChannelToggle: React.FC<ChannelToggleProps> = ({ value, onValueChange }) =
       >
         <Layout className="w-4 h-4" />
         <span>In-App</span>
+      </button>
+
+      <button
+        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          value === 'whatsapp'
+            ? 'bg-[#3D1D72] text-white'
+            : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+        }`}
+        onClick={() => onValueChange('whatsapp')}
+      >
+        <MessageSquare className="w-4 h-4" />
+        <span>WhatsApp</span>
       </button>
     </div>
   );

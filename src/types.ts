@@ -8,6 +8,11 @@ export interface MarketingContent {
   brandColor?: string;
   contentType: ContentType;
 
+  // WhatsApp
+  whatsappMessage: string;
+  whatsappIcon: string;
+  whatsappReply: string;
+
   // SMS
   smsMessage: string;
   smsIcon: string;
