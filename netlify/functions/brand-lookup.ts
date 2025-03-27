@@ -9,17 +9,27 @@ const getBestLogo = (logos: any[]) => {
     return null;
   }
   
-  const primaryLogo = logos.find(logo => logo.type === 'logo');
-  const logo = primaryLogo || logos[0];
-  console.log('Selected logo:', logo);
+  // First find logos with type "logo"
+  const logoLogos = logos.filter(logo => logo.type === 'logo');
+  if (!logoLogos.length) {
+    console.log('No logos with type "logo" found');
+    return null;
+  }
+
+  // Prefer dark theme logos
+  const darkLogo = logoLogos.find(logo => logo.theme === 'dark');
+  const lightLogo = logoLogos.find(logo => logo.theme === 'light');
+  const selectedLogo = darkLogo || lightLogo || logoLogos[0];
   
-  if (!logo.formats?.length) {
+  console.log('Selected logo:', selectedLogo);
+  
+  if (!selectedLogo.formats?.length) {
     console.log('No formats found for selected logo');
     return null;
   }
   
-  const svgFormat = logo.formats.find(f => f.format === 'svg');
-  const pngFormat = logo.formats.find(f => f.format === 'png');
+  const svgFormat = selectedLogo.formats.find(f => f.format === 'svg');
+  const pngFormat = selectedLogo.formats.find(f => f.format === 'png');
   const selectedFormat = svgFormat || pngFormat;
   
   console.log('Selected format:', selectedFormat);
