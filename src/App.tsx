@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Video, User, Building2, MessageCircle, Search, Wand2, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { PostHogProvider } from 'posthog-js/react';
@@ -45,6 +45,7 @@ function App() {
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   const [domainInput, setDomainInput] = useState('');
   const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
+  const domainInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState<MarketingContent>({
     brandName: '',
     logoUrl: '',
@@ -330,11 +331,19 @@ function App() {
     }
   };
 
+  const handleWelcomeClose = () => {
+    setShowWelcomeModal(false);
+    // Focus the domain input after a short delay to ensure the modal transition is complete
+    setTimeout(() => {
+      domainInputRef.current?.focus();
+    }, 100);
+  };
+
   return (
     <PostHogProvider client={posthog}>
       <div className="min-h-screen bg-[#F8F7FF]">
         {showWelcomeModal && (
-          <WelcomeModal onClose={() => setShowWelcomeModal(false)} />
+          <WelcomeModal onClose={handleWelcomeClose} />
         )}
         <Toaster 
           position="top-right"
@@ -388,6 +397,7 @@ function App() {
                   <div className="relative">
                     <input
                       type="text"
+                      ref={domainInputRef}
                       value={domainInput}
                       onChange={(e) => setDomainInput(e.target.value)}
                       placeholder="e.g uniqlo.com"
