@@ -77,7 +77,16 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           </div>
         </div>
 
-        <div className="pt-4 border-t mt-8 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center">
+          <button
+            onClick={onClose}
+            className="bg-[#3D1D72] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#2D1652] transition-colors"
+          >
+            Get Started (Free)
+          </button>
+        </div>
+
+        <div className="pt-4 border-t mt-8 text-sm text-gray-500 text-center">
           built by nick robin 🫡 happy prospecting
         </div>
       </div>
