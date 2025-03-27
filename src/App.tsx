@@ -73,6 +73,8 @@ function App() {
     inAppInputLabel: 'Email Address',
     inAppInputPlaceholder: 'Enter your email to get started',
     inAppSubmitButtonText: 'Join Now',
+    inAppInputLabel2: '',
+    inAppInputPlaceholder2: '',
     userReply: '',
     brandReply: '',
   });

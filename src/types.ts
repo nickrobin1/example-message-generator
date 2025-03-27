@@ -41,6 +41,8 @@ export interface MarketingContent {
   inAppInputLabel: string;
   inAppInputPlaceholder: string;
   inAppSubmitButtonText: string;
+  inAppInputLabel2?: string;
+  inAppInputPlaceholder2?: string;
   userReply: string;
   brandReply: string;
 }

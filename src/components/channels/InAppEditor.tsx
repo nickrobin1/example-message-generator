@@ -1,5 +1,5 @@
-import React from 'react';
-import { MessageCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, Plus, Minus } from 'lucide-react';
 import { MarketingContent } from '../../types';
 import ImageInput from '../ImageInput';
 
@@ -9,6 +9,8 @@ interface InAppEditorProps {
 }
 
 const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) => {
+  const [showSecondInput, setShowSecondInput] = useState(false);
+
   const handleSurveyOptionChange = (index: number, value: string) => {
     const newOptions = [...content.inAppSurveyOptions];
     newOptions[index] = value;
@@ -142,6 +144,56 @@ const InAppEditor: React.FC<InAppEditorProps> = ({ content, onContentChange }) =
                 placeholder="Enter your email to get updates"
               />
             </div>
+            
+            <button
+              type="button"
+              onClick={() => {
+                setShowSecondInput(!showSecondInput);
+                if (!showSecondInput) {
+                  onContentChange('inAppInputLabel2', '');
+                  onContentChange('inAppInputPlaceholder2', '');
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              {showSecondInput ? (
+                <>
+                  <Minus className="w-4 h-4" />
+                  Remove second input field
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  Add another input field
+                </>
+              )}
+            </button>
+
+            {showSecondInput && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Second Input Label</label>
+                  <input
+                    type="text"
+                    value={content.inAppInputLabel2}
+                    onChange={(e) => onContentChange('inAppInputLabel2', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Phone Number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Second Input Placeholder</label>
+                  <input
+                    type="text"
+                    value={content.inAppInputPlaceholder2}
+                    onChange={(e) => onContentChange('inAppInputPlaceholder2', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+              </>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Submit Button Text</label>
               <input

@@ -173,6 +173,18 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
+                  {content.inAppInputLabel2 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {content.inAppInputLabel2}
+                      </label>
+                      <input
+                        type={content.inAppInputLabel2.toLowerCase().includes('phone') ? 'tel' : 'text'}
+                        placeholder={content.inAppInputPlaceholder2 || 'Enter your phone number'}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
                   <button 
                     className="w-full text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
                     style={{ backgroundColor: content.brandColor }}
