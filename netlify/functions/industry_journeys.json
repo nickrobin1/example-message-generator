@@ -35,6 +35,10 @@
           "Goal": "Collect content preferences",
           "Prompt": "Design an in-app survey that asks users about their favorite genres, shows, or viewing times.",
           "Type": "Survey"
+        },
+        "Push": {
+          "Goal": "Notify user when new content is available",
+          "Prompt": "Craft a push notification letting the user know that a series that is on their favorites has a new episode."
         }
       }
     },
@@ -44,11 +48,11 @@
       "steps": {
         "Email": {
           "Goal": "Incentivize app download with promo",
-          "Prompt": "Write a promotional email introducing the first-order discount and inviting the user to download the app."
+          "Prompt": "Write a promotional email welcoming user,introducing the first-order discount and inviting the user to download the app."
         },
         "Content Card": {
-          "Goal": "Prompt first in-app order",
-          "Prompt": "Create an in-app content card promoting the discount and prompting the user to place their first order."
+          "Goal": "Prompt popular items to the user in feed",
+          "Prompt": "Create an content card promoting popular items and reminding user they can apply their promo code."
         },
         "Push": {
           "Goal": "Confirm order and status",
@@ -71,6 +75,11 @@
         "Email": {
           "Goal": "Confirm setup success",
           "Prompt": "Write a confirmation email thanking the user for setting up direct deposit and outlining what happens next."
+        },
+        "In-App": {
+          "Goal": "Prime for Push Opt-In",
+          "Prompt": "Create an in-app message that educates user on benefits of opting into push notifications with this brand and asks them to opt in.",
+          "Type": "Modal with Logo"
         }
       }
     },
@@ -85,8 +94,13 @@
         "Content Card": {
           "Goal": "Cross-sell trip add-ons",
           "Prompt": "Create an in-app content card suggesting popular add-ons such as dinner reservations or local experiences."
+        },
+        "In-App": {
+          "Goal": "Capture email for personalized itineraries",
+          "Prompt": "Create an email capture form that offers to send personalized itineraries and travel recommendations",
+          "Type": "Email Capture"
         }
       }
     }
   ]
-}
+} 

@@ -27,12 +27,36 @@ let journeyCache: IndustryJourneys | null = null;
 
 function getIndustryJourneys(): IndustryJourneys {
   if (!journeyCache) {
-    const journeyPath = path.join(process.cwd(), 'industry_journeys.json');
-    const content = fs.readFileSync(journeyPath, 'utf-8');
+    // Try multiple possible paths for the JSON file
+    const possiblePaths = [
+      path.join(__dirname, 'industry_journeys.json'),
+      path.join(__dirname, '..', 'industry_journeys.json'),
+      path.join(process.cwd(), 'netlify', 'functions', 'industry_journeys.json')
+    ];
+
+    let content: string | null = null;
+    let usedPath: string | null = null;
+
+    // Try each path until we find one that works
+    for (const journeyPath of possiblePaths) {
+      try {
+        content = fs.readFileSync(journeyPath, 'utf-8');
+        usedPath = journeyPath;
+        console.log('Successfully loaded industry_journeys.json from:', journeyPath);
+        break;
+      } catch (error) {
+        console.log('Failed to load from path:', journeyPath);
+      }
+    }
+
+    if (!content) {
+      throw new Error('Could not find industry_journeys.json in any expected location');
+    }
+
     const parsed = JSON.parse(content) as IndustryJourneys;
     journeyCache = parsed;
-    console.log('Loaded industry journeys:', 
-      parsed.industries.map(j => `${j.name} - ${j.use_case}`));
+    console.log('Loaded industry journeys from:', usedPath);
+    console.log('Available industries:', parsed.industries.map(j => j.name));
   }
   return journeyCache as IndustryJourneys;
 }
@@ -101,7 +125,9 @@ export const handler: Handler = async (event) => {
 
     // Make the OpenAI API call
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+          // @cursor-skip
+          model: 'gpt-4o-mini',
+          // @cursor-end-skip
       messages: [
         {
           role: "system",
