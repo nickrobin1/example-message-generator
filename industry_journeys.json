@@ -1,0 +1,92 @@
+{
+  "industries": [
+    {
+      "name": "Retail & Consumer Goods",
+      "use_case": "Abandoned Cart",
+      "steps": {
+        "Email": {
+          "Goal": "Drive return with coupon offer",
+          "Prompt": "Write a welcome email that includes a 15% coupon code and encourages the user to return and complete their purchase."
+        },
+        "SMS": {
+          "Goal": "Recover cart with quick reminder",
+          "Prompt": "Create a short SMS that references the user's last viewed items and includes the 15% discount code."
+        },
+        "Push": {
+          "Goal": "Confirm order shipment or delivery",
+          "Prompt": "Craft a push notification letting the user know their order has shipped or is out for delivery."
+        },
+        "In-App": {
+          "Goal": "Capture user contact information",
+          "Prompt": "Create an in-app message that offers a 15% discount code in exchange for the user providing their email and phone number to enable personalized shopping updates.",
+          "Type": "Email/Phone Capture"
+        }
+      }
+    },
+    {
+      "name": "Media & Entertainment",
+      "use_case": "Account Creation to App Download",
+      "steps": {
+        "Email": {
+          "Goal": "Promote app for better experience",
+          "Prompt": "Write an email that highlights exclusive app benefits and encourages users to download it now."
+        },
+        "In-App": {
+          "Goal": "Collect content preferences",
+          "Prompt": "Design an in-app survey that asks users about their favorite genres, shows, or viewing times.",
+          "Type": "Survey"
+        }
+      }
+    },
+    {
+      "name": "Restaurants & On-Demand",
+      "use_case": "App Download and First Purchase",
+      "steps": {
+        "Email": {
+          "Goal": "Incentivize app download with promo",
+          "Prompt": "Write a promotional email introducing the first-order discount and inviting the user to download the app."
+        },
+        "Content Card": {
+          "Goal": "Prompt first in-app order",
+          "Prompt": "Create an in-app content card promoting the discount and prompting the user to place their first order."
+        },
+        "Push": {
+          "Goal": "Confirm order and status",
+          "Prompt": "Write a push notification that confirms the order and includes delivery or pickup time."
+        }
+      }
+    },
+    {
+      "name": "Financial Services",
+      "use_case": "Drive Direct Deposit Set-Up",
+      "steps": {
+        "Push": {
+          "Goal": "Nudge setup for direct deposit",
+          "Prompt": "Write a concise push notification that highlights the convenience and speed of setting up direct deposit."
+        },
+        "Content Card": {
+          "Goal": "Explain direct deposit benefits",
+          "Prompt": "Create an in-app content card explaining why direct deposit is beneficial and linking to the setup screen."
+        },
+        "Email": {
+          "Goal": "Confirm setup success",
+          "Prompt": "Write a confirmation email thanking the user for setting up direct deposit and outlining what happens next."
+        }
+      }
+    },
+    {
+      "name": "Travel & Hospitality",
+      "use_case": "Abandoned Booking to App Download",
+      "steps": {
+        "Email": {
+          "Goal": "Recover booking, push app download",
+          "Prompt": "Write a two-part email: first, a reminder to finish booking their trip; second, an invitation to download the app for itinerary tracking and travel updates."
+        },
+        "Content Card": {
+          "Goal": "Cross-sell trip add-ons",
+          "Prompt": "Create an in-app content card suggesting popular add-ons such as dinner reservations or local experiences."
+        }
+      }
+    }
+  ]
+}

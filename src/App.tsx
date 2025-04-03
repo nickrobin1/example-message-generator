@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Video, User, Building2, MessageCircle, Search, Wand2, X } from 'lucide-react';
+import { ChevronLeft, Video, User, Building2, MessageCircle, Search, Wand2, X, XCircle } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { PostHogProvider } from 'posthog-js/react';
 import { posthog } from './lib/posthog';
@@ -12,8 +12,8 @@ import InAppEditor from './components/channels/InAppEditor';
 import InAppPreview from './components/channels/InAppPreview';
 import WelcomeModal from './components/WelcomeModal';
 import { getCurrentTime } from './utils/time';
-import { generateMarketingContent } from './utils/ai';
-import type { MarketingContent, BrandFetchResponse, ContentType } from './types';
+import { generateMarketingContent, determineIndustry } from './utils/ai';
+import type { MarketingContent, BrandFetchResponse } from './types';
 import wallpaperImage from './assets/iOS wallpaper.png';
 import flashlightIcon from './assets/Flashlight button.svg';
 import cameraIcon from './assets/Camera button.svg';
@@ -31,6 +31,7 @@ import ColorPicker from './components/ColorPicker';
 import { extractDominantColor } from './utils/color';
 import WhatsAppEditor from './components/channels/WhatsAppEditor';
 import WhatsAppPreview from './components/channels/WhatsAppPreview';
+import { CardPreview } from './components/channels/CardPreview';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -51,41 +52,33 @@ function App() {
     logoUrl: '',
     brandDescription: '',
     brandColor: '#3D1D72',
-    contentType: 'General Marketing',
+    industry: '',
+    useCase: '',
     whatsappMessage: 'Hey there! 👋 Check out our latest offers just for you. Click here to explore more.',
-    whatsappIcon: '',
-    whatsappReply: '',
-    smsMessage: 'Get 20% off your next purchase! Limited time offer. Click here to shop now.',
-    smsIcon: '',
-    pushMessage: "Don't miss out! Special offer just for you. Tap to learn more.",
-    pushIcon: '',
-    cardTitle: 'Special Offer',
-    cardDescription: 'Discover our latest collection and enjoy exclusive member benefits.',
-    cardImage: '',
-    emailSubject: 'Welcome to Our Community',
-    emailHeadline: 'Join Us Today',
-    emailBody: 'Discover amazing products and exclusive offers tailored just for you.',
-    emailCta: 'Get Started',
-    emailImage: '',
-    inAppType: 'modal-logo',
+    smsMessage: 'Check out our latest offers! Click here to explore more.',
+    pushMessage: 'New offers waiting for you! Tap to explore.',
+    cardTitle: 'Special Offers',
+    cardDescription: 'Check out our latest deals and promotions.',
     inAppTitle: 'Welcome!',
-    inAppBody: 'Join our community and unlock exclusive benefits today.',
-    inAppCtaText: 'Get Started',
-    inAppImage: '',
-    inAppBackgroundImage: '',
+    inAppBody: 'We\'re glad you\'re here. Check out our latest offers.',
+    inAppCtaText: 'Explore Now',
+    inAppType: 'modal-logo',
     inAppSurveyOptions: [],
     inAppSelectedOptions: [],
-    inAppSurveyType: 'single',
-    inAppInputLabel: 'Email Address',
-    inAppInputPlaceholder: 'Enter your email to get started',
-    inAppSubmitButtonText: 'Join Now',
-    inAppInputLabel2: '',
-    inAppInputPlaceholder2: '',
-    userReply: '',
-    brandReply: '',
+    inAppInputLabel: 'Email',
+    inAppInputPlaceholder: 'Enter your email',
+    emailSubject: 'Special offers just for you',
+    emailHeadline: 'Check out our latest deals',
+    emailBody: 'We\'ve got some amazing offers waiting for you. Click below to explore.',
+    emailCta: 'Shop Now'
   });
   const [shouldGenerateContent, setShouldGenerateContent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [icons, setIcons] = useState({
+    sms: '',
+    push: '',
+    whatsapp: ''
+  });
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -216,6 +209,9 @@ function App() {
     }
 
     setLoading(true);
+    setError(null);
+    showToast('Looking up brand...', 'success');
+
     try {
       const sanitizedDomain = sanitizeDomain(domain);
       const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(sanitizedDomain)}`;
@@ -264,6 +260,24 @@ function App() {
         brandColor: data.colors?.primary || '#3D1D72',
       }));
 
+      // Determine industry after successful brand lookup
+      try {
+        const industryDetermination = await determineIndustry(data.name || '', description);
+        setContent(prev => ({
+          ...prev,
+          industry: industryDetermination.industry,
+          useCase: industryDetermination.useCase
+        }));
+      } catch (error) {
+        console.error('Failed to determine industry:', error);
+        // Default to "Other Industries" if determination fails
+        setContent(prev => ({
+          ...prev,
+          industry: 'Other Industries',
+          useCase: 'General Marketing'
+        }));
+      }
+
       // Extract color from the logo if we got one
       if (data.logo) {
         extractDominantColor(data.logo)
@@ -300,12 +314,15 @@ function App() {
     showToast('Generating content...', 'success');
 
     try {
-      const generatedContent = await generateMarketingContent({
-        name: content.brandName,
-        domain: '',
-        logo: content.logoUrl,
-        description: content.brandDescription
-      }, content.contentType);
+      const generatedContent = await generateMarketingContent(
+        {
+          name: content.brandName,
+          domain: '',
+          logo: content.logoUrl,
+          description: content.brandDescription
+        },
+        content.industry
+      );
 
       setContent(prev => ({
         ...prev,
@@ -322,7 +339,7 @@ function App() {
       showToast(errorMessage, 'error');
       analytics.trackError('content_generation_failed', errorMessage, {
         brandName: content.brandName,
-        contentType: content.contentType,
+        industry: content.industry,
         hasDescription: !!content.brandDescription,
         descriptionLength: content.brandDescription.length
       });
@@ -442,22 +459,40 @@ function App() {
 
                 {isManualEntryOpen && (
                   <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
-                      <FakeBrandAutocomplete
-                        value={content.brandName}
-                        onChange={(value) => handleInputChange('brandName', value)}
-                        onSelectBrand={(brand) => {
-                          analytics.trackBrandLookup(brand.name);
-                          setContent(prev => ({
-                            ...prev,
-                            brandName: brand.name,
-                            logoUrl: `/src/assets/Fake Brands/${brand.image}`,
-                            brandDescription: brand.description,
-                            brandColor: brand.colors?.primary || '#3D1D72'
-                          }));
-                        }}
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
+                        <FakeBrandAutocomplete
+                          value={content.brandName}
+                          onChange={(value) => handleInputChange('brandName', value)}
+                          onSelectBrand={(brand) => {
+                            analytics.trackBrandLookup(brand.name);
+                            setContent(prev => ({
+                              ...prev,
+                              brandName: brand.name,
+                              logoUrl: `/src/assets/Fake Brands/${brand.image}`,
+                              brandDescription: brand.description,
+                              brandColor: brand.colors?.primary || '#3D1D72'
+                            }));
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-2">Industry</label>
+                        <select
+                          value={content.industry}
+                          onChange={(e) => handleInputChange('industry', e.target.value)}
+                          className="w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
+                        >
+                          <option value="">Select an industry</option>
+                          <option value="Retail & Consumer Goods">Retail & Consumer Goods</option>
+                          <option value="Media & Entertainment">Media & Entertainment</option>
+                          <option value="Restaurants & On-Demand">Restaurants & On-Demand</option>
+                          <option value="Financial Services">Financial Services</option>
+                          <option value="Travel & Hospitality">Travel & Hospitality</option>
+                          <option value="Other Industries">Other Industries</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="grid grid-cols-[1fr_auto] gap-x-4">
                       <div>
@@ -487,46 +522,39 @@ function App() {
                         placeholder="Enter brand description..."
                       />
                     </div>
-                    <div className="flex justify-end gap-3 items-end">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-600 mb-2">Content Type</label>
-                        <div className="relative">
-                          <select
-                            value={content.contentType}
-                            onChange={(e) => handleInputChange('contentType', e.target.value as ContentType)}
-                            className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm bg-white pr-10 py-2 appearance-none cursor-pointer hover:border-gray-300 transition-colors"
-                          >
-                            <option value="General Marketing">General Marketing</option>
-                            <option value="Retention">Retention</option>
-                            <option value="Loyalty">Loyalty</option>
-                            <option value="Transactional">Transactional</option>
-                            <option value="Onboarding">Onboarding</option>
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
-                            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
+
+                    <div className="flex justify-end">
                       <button
                         onClick={handleGenerateContent}
-                        disabled={aiLoading || !content.brandDescription}
-                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#3D1D72] hover:bg-[#2D1655] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        disabled={!content.brandDescription || !content.industry || aiLoading}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#3D1D72] hover:bg-[#2D1655] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D1D72] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {aiLoading ? (
                           <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                            Generating Content
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                            Generating...
                           </>
                         ) : (
-                          <>
-                            <Wand2 className="w-5 h-5 mr-2" />
-                            {hasGeneratedContent ? 'Regenerate Content' : 'Generate Content'}
-                          </>
+                          'Generate Content'
                         )}
                       </button>
                     </div>
+
+                    {error && (
+                      <div className="rounded-md bg-red-50 p-4">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <XCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                          </div>
+                          <div className="ml-3">
+                            <h3 className="text-sm font-medium text-red-800">Error</h3>
+                            <div className="mt-2 text-sm text-red-700">
+                              <p>{error}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -660,29 +688,8 @@ function App() {
 
             {activeChannel === 'card' && (
               <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Card Preview</h2>} content={content}>
-                <div className="bg-white h-full p-4">
-                  <div className="bg-white rounded-lg overflow-hidden shadow">
-                    {content.cardImage ? (
-                      <img 
-                        src={content.cardImage} 
-                        alt={content.cardTitle}
-                        className="w-full h-48 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-12 h-12 rounded-lg bg-gray-200 mx-auto mb-2 flex items-center justify-center">
-                            <User className="w-6 h-6 text-gray-400" />
-                          </div>
-                          <p className="text-sm text-gray-400">Add an image URL to preview</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold">{content.cardTitle}</h3>
-                      <p className="mt-2 text-gray-600">{content.cardDescription}</p>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
+                  <CardPreview content={content} />
                 </div>
               </DeviceFrame>
             )}

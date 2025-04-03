@@ -25,7 +25,6 @@ export const analytics = {
   trackBrandLookup: (brandDomain: string) => {
     try {
       if (!isPostHogAvailable()) {
-        console.warn('PostHog not available, skipping brand lookup tracking');
         return;
       }
 
@@ -33,9 +32,8 @@ export const analytics = {
         brand_domain: brandDomain,
         timestamp: new Date().toISOString()
       });
-      console.log('Tracked brand lookup:', brandDomain);
     } catch (error) {
-      console.error('Failed to track brand lookup:', error);
+      // Silent error handling
     }
   },
 
@@ -43,16 +41,14 @@ export const analytics = {
   trackGenerateClick: () => {
     try {
       if (!isPostHogAvailable()) {
-        console.warn('PostHog not available, skipping generate click tracking');
         return;
       }
 
       posthog.capture('generate_click', {
         timestamp: new Date().toISOString()
       });
-      console.log('Tracked generate click');
     } catch (error) {
-      console.error('Failed to track generate click:', error);
+      // Silent error handling
     }
   },
 
@@ -60,7 +56,6 @@ export const analytics = {
   trackExportClick: (channel: string) => {
     try {
       if (!isPostHogAvailable()) {
-        console.warn('PostHog not available, skipping export click tracking');
         return;
       }
 
@@ -68,9 +63,8 @@ export const analytics = {
         channel,
         timestamp: new Date().toISOString()
       });
-      console.log('Tracked export click:', channel);
     } catch (error) {
-      console.error('Failed to track export click:', error);
+      // Silent error handling
     }
   },
 
@@ -78,7 +72,6 @@ export const analytics = {
   trackCopyClick: (channel: string) => {
     try {
       if (!isPostHogAvailable()) {
-        console.warn('PostHog not available, skipping copy click tracking');
         return;
       }
 
@@ -86,9 +79,8 @@ export const analytics = {
         channel,
         timestamp: new Date().toISOString()
       });
-      console.log('Tracked copy click:', channel);
     } catch (error) {
-      console.error('Failed to track copy click:', error);
+      // Silent error handling
     }
   },
 
@@ -96,7 +88,6 @@ export const analytics = {
   trackError: (errorType: string, errorMessage: string, context?: Record<string, any>) => {
     try {
       if (!isPostHogAvailable()) {
-        console.warn('PostHog not available, skipping error tracking');
         return;
       }
 
@@ -106,9 +97,8 @@ export const analytics = {
         context,
         timestamp: new Date().toISOString()
       });
-      console.log('Tracked error:', { errorType, errorMessage, context });
     } catch (error) {
-      console.error('Failed to track error:', error);
+      // Silent error handling
     }
   },
 
@@ -116,7 +106,6 @@ export const analytics = {
   trackFeedbackSubmit: (feedbackType: 'positive' | 'negative', feedbackText?: string) => {
     try {
       if (!isPostHogAvailable()) {
-        console.warn('PostHog not available, skipping feedback submit tracking');
         return;
       }
 
@@ -125,9 +114,8 @@ export const analytics = {
         feedback_text: feedbackText,
         timestamp: new Date().toISOString()
       });
-      console.log('Tracked feedback submit:', feedbackType);
     } catch (error) {
-      console.error('Failed to track feedback submit:', error);
+      // Silent error handling
     }
   }
 }; 

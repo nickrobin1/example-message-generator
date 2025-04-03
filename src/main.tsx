@@ -41,10 +41,7 @@ const initializePostHog = () => {
         options: {
           api_host: posthogHost,
           loaded: (posthogInstance: typeof posthog) => {
-            if (import.meta.env.DEV) {
-              posthogInstance.debug() // Enable debug mode only in development
-              console.log('PostHog initialized successfully');
-            }
+            // Removed debug mode and console log
           },
           capture_pageview: true,
           capture_pageleave: true,

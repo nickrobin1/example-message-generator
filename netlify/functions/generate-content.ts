@@ -1,9 +1,105 @@
 import { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+interface ChannelStep {
+  Goal: string;
+  Prompt: string;
+  Type?: string;
+}
+
+interface IndustryJourney {
+  name: string;
+  use_case: string;
+  steps: {
+    [channel: string]: ChannelStep;
+  };
+}
+
+interface IndustryJourneys {
+  industries: Array<{
+    name: string;
+    use_case: string;
+    steps: {
+      [key: string]: ChannelStep;
+    };
+  }>;
+}
+
+// Cache for industry journeys
+let journeyCache: IndustryJourneys | null = null;
+
+// Default prompts if none found in journeys
+const defaultPrompts = {
+  whatsapp: "Create an engaging WhatsApp message with emojis",
+  sms: "Write a short message under 160 characters",
+  push: "Create a brief push notification message",
+  card: "Write an engaging card title and description",
+  inApp: "Create a welcoming in-app message with clear call to action",
+  email: "Write a compelling email with subject, headline, body, and call to action"
+};
+
+function getIndustryJourneys(): IndustryJourneys {
+  if (!journeyCache) {
+    const journeyPath = path.join(process.cwd(), 'industry_journeys.json');
+    const content = fs.readFileSync(journeyPath, 'utf-8');
+    const parsed = JSON.parse(content) as IndustryJourneys;
+    journeyCache = parsed;
+    console.log('Loaded industry journeys:', 
+      parsed.industries.map(j => `${j.name} - ${j.use_case}`));
+  }
+  return journeyCache as IndustryJourneys;
+}
+
+function findJourney(industry: string): IndustryJourney | undefined {
+  const journeys = getIndustryJourneys();
+  return journeys.industries.find(j => j.name === industry);
+}
+
+interface ContentResponse {
+  content: {
+    whatsappMessage: string;
+    smsMessage: string;
+    pushMessage: string;
+    cardTitle: string;
+    cardDescription: string;
+    inAppTitle: string;
+    inAppBody: string;
+    inAppCtaText: string;
+    inAppType?: string;
+    emailSubject: string;
+    emailHeadline: string;
+    emailBody: string;
+    emailCta: string;
+  };
+  metadata: {
+    industry: string;
+    useCase: string;
+    generatedAt: string;
+    model: string;
+    confidence: number;
+  };
+}
+
+// Map journey in-app types to frontend types
+function mapInAppType(journeyType?: string): string {
+  if (!journeyType) return 'modal-logo';
+  
+  const typeMap: Record<string, string> = {
+    'Email/Phone Capture': 'email-phone-capture',
+    'Survey': 'survey',
+    'Modal with Logo': 'modal-logo',
+    'Modal with Image': 'modal-image',
+    'Fullscreen': 'fullscreen'
+  };
+
+  return typeMap[journeyType] || 'modal-logo';
+}
 
 export const handler: Handler = async (event) => {
   // Debug request details
@@ -60,7 +156,8 @@ export const handler: Handler = async (event) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const { brand, contentType = 'General Marketing' } = JSON.parse(event.body || '{}');
+    const { brand, industry, useCase } = JSON.parse(event.body || '{}');
+    console.log('Request payload:', { brand: brand.name, industry, useCase });
 
     if (!brand?.description) {
       return {
@@ -70,17 +167,30 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Use long description if available, otherwise fall back to regular description
     const brandDescription = brand.longDescription || brand.description;
+    console.log('Using brand description:', brandDescription);
 
-    // Define content type specific instructions
-    const contentTypeInstructions = {
-      'General Marketing': 'Focus on general brand awareness, product highlights, and value propositions.',
-      'Retention': 'Focus on customer satisfaction, continued engagement, and reinforcing the value of staying with the brand.',
-      'Loyalty': 'Focus on rewards, exclusive benefits, VIP treatment, and making customers feel special.',
-      'Transactional': 'Focus on order confirmations, shipping updates, and account-related notifications. Keep it clear and informative.',
-      'Onboarding': 'Focus on welcome messages, getting started guides, and helping users activate and understand key features.'
+    // Find matching industry journey
+    const journey = findJourney(industry);
+    console.log('Found journey:', journey ? `${journey.name} - ${journey.use_case}` : 'No matching journey');
+
+    // Get prompts from journey or defaults
+    const prompts = {
+      whatsapp: journey?.steps.WhatsApp?.Prompt || defaultPrompts.whatsapp,
+      sms: journey?.steps.SMS?.Prompt || defaultPrompts.sms,
+      push: journey?.steps.Push?.Prompt || defaultPrompts.push,
+      card: journey?.steps['Content Card']?.Prompt || defaultPrompts.card,
+      inApp: journey?.steps['In-App']?.Prompt || defaultPrompts.inApp,
+      email: journey?.steps.Email?.Prompt || defaultPrompts.email
     };
+
+    // Get in-app type from journey if available
+    const inAppType = journey?.steps['In-App']?.Type;
+    const mappedInAppType = mapInAppType(inAppType);
+
+    console.log('Using prompts:', prompts);
+    console.log('In-App Type:', inAppType);
+    console.log('Mapped In-App Type:', mappedInAppType);
 
     const response = await openai.chat.completions.create({
       // @cursor-skip
@@ -89,72 +199,80 @@ export const handler: Handler = async (event) => {
       messages: [
         {
           role: 'system',
-          content: `You are a marketing copywriter specializing in ${contentType.toLowerCase()} messaging. 
-          ${contentTypeInstructions[contentType as keyof typeof contentTypeInstructions]}
+          content: `You are a marketing copywriter specializing in ${industry} industry content.
           
-          Always respond with valid JSON in this exact format:
+          Generate content that follows the specific prompts while incorporating the brand's unique value proposition.
+          
+          Respond with ONLY a valid JSON object containing content for each channel. No markdown, no backticks.
           {
-            "whatsappMessage": "engaging WhatsApp message with emojis",
-            "smsMessage": "short message under 160 chars",
-            "pushMessage": "brief push notification message",
-            "cardTitle": "engaging card title",
-            "cardDescription": "short card description",
-            "inAppTitle": "welcoming title",
-            "inAppBody": "brief body text",
-            "inAppCtaText": "clear call to action",
-            "emailSubject": "compelling subject line",
-            "emailHeadline": "short, attention-grabbing headline (max 1 line)",
-            "emailBody": "concise body text focusing on key benefits (2-3 lines max)",
-            "emailCta": "clear call to action (2-4 words)"
-          }
-          
-          Keep email content especially concise:
-          - Headline should be one line only
-          - Body text should be 2-3 lines maximum
-          - CTA should be short and action-oriented
-          
-          For WhatsApp messages:
-          - Use emojis naturally to enhance engagement
-          - Keep the tone conversational and friendly
-          - Make it feel personal and interactive
-          
-          Ensure all content aligns with ${contentType.toLowerCase()} messaging best practices and the brand's voice.`
+            "whatsappMessage": "string",
+            "smsMessage": "string",
+            "pushMessage": "string",
+            "cardTitle": "string",
+            "cardDescription": "string",
+            "inAppTitle": "string",
+            "inAppBody": "string",
+            "inAppCtaText": "string",
+            "inAppType": "string",
+            "emailSubject": "string",
+            "emailHeadline": "string",
+            "emailBody": "string",
+            "emailCta": "string"
+          }`
         },
         {
           role: 'user',
-          content: `Generate ${contentType.toLowerCase()} messaging content for this brand: ${brandDescription}`
+          content: `Generate content for this ${industry} brand:
+          
+          Brand: ${brand.name}
+          Description: ${brandDescription}
+          
+          Channel Requirements:
+          - WhatsApp: ${prompts.whatsapp}
+          - SMS: ${prompts.sms}
+          - Push: ${prompts.push}
+          - Content Card: ${prompts.card}
+          - In-App Message: ${prompts.inApp}${inAppType ? ` (Type: ${inAppType})` : ''}
+          - Email: ${prompts.email}
+          
+          Generate content that fulfills each channel's specific requirements while maintaining the brand's voice.`
         }
       ],
       temperature: 0.7,
       max_tokens: 1000,
     });
 
-    const content = response.choices[0].message?.content || '{}';
-    
-    try {
-      // Clean up markdown formatting if present
-      const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
-      
-      // Validate that we got valid JSON back
-      const parsedContent = JSON.parse(cleanContent);
+    console.log('OpenAI raw response:', response.choices[0].message?.content);
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(parsedContent)
-      };
-    } catch (parseError) {
-      console.error('Failed to parse OpenAI response:', content);
-      console.error('Parse error:', parseError);
-      throw new Error('Invalid response format from OpenAI');
-    }
-  } catch (error) {
-    console.error('Error:', error);
+    const content = response.choices[0].message?.content || '{}';
+    const parsedContent = JSON.parse(content);
+
+    // Add the mapped in-app type from the journey if available
+    parsedContent.inAppType = mappedInAppType;
+
     return {
-      statusCode: error.status || 500,
+      statusCode: 200,
       headers,
       body: JSON.stringify({
-        error: error instanceof Error ? error.message : 'Internal server error'
+        content: parsedContent,
+        metadata: {
+          industry: journey?.name || industry,
+          useCase: journey?.use_case || 'Custom',
+          generatedAt: new Date().toISOString(),
+          model: 'gpt-4',
+          confidence: 0.9
+        }
+      })
+    };
+  } catch (error) {
+    console.error('Error generating content:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ 
+        error: 'Failed to generate content',
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        timestamp: new Date().toISOString()
       })
     };
   }

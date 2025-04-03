@@ -1,55 +1,37 @@
-export type ContentType = 'General Marketing' | 'Retention' | 'Loyalty' | 'Transactional' | 'Onboarding';
-
 export interface MarketingContent {
-  // Brand info
   brandName: string;
   logoUrl: string;
   brandDescription: string;
-  brandColor?: string;
-  contentType: ContentType;
-
-  // WhatsApp
+  brandColor: string;
+  industry: string;
+  useCase: string;
+  generatedAt?: string;
   whatsappMessage: string;
-  whatsappIcon: string;
-  whatsappReply: string;
-
-  // SMS
   smsMessage: string;
-  smsIcon: string;
-
-  // Push
   pushMessage: string;
-  pushIcon: string;
-
-  // Card
   cardTitle: string;
   cardDescription: string;
-  cardImage: string;
-
-  // Email
+  cardImage?: string;
+  inAppTitle: string;
+  inAppBody: string;
+  inAppCtaText: string;
+  inAppType?: string;
+  inAppImage?: string;
+  inAppBackgroundImage?: string;
+  inAppSurveyOptions: string[];
+  inAppSelectedOptions: string[];
+  inAppInputLabel?: string;
+  inAppInputPlaceholder?: string;
+  inAppInputLabel2?: string;
+  inAppInputPlaceholder2?: string;
+  inAppSubmitButtonText?: string;
   emailSubject: string;
   emailHeadline: string;
   emailBody: string;
   emailCta: string;
-  emailImage: string;
-
-  // In-App Message
-  inAppType: 'modal-logo' | 'modal-image' | 'survey' | 'email-phone-capture' | 'fullscreen';
-  inAppTitle: string;
-  inAppBody: string;
-  inAppCtaText: string;
-  inAppImage: string;
-  inAppBackgroundImage: string;
-  inAppSurveyOptions: string[];
-  inAppSelectedOptions: string[];
-  inAppSurveyType: 'single' | 'multiple';
-  inAppInputLabel: string;
-  inAppInputPlaceholder: string;
-  inAppSubmitButtonText: string;
-  inAppInputLabel2?: string;
-  inAppInputPlaceholder2?: string;
-  userReply: string;
-  brandReply: string;
+  smsIcon?: string;
+  pushIcon?: string;
+  whatsappIcon?: string;
 }
 
 export interface BrandFetchResponse {
@@ -72,4 +54,11 @@ export interface AIGeneratedContent {
   inAppTitle: string;
   inAppBody: string;
   inAppCtaText: string;
+  inAppType?: string;
+}
+
+export interface IndustryDetermination {
+  industry: string;
+  useCase: string;
+  confidence: number;
 }
