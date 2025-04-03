@@ -1,13 +1,12 @@
 import { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
-import fs from 'fs';
-import path from 'path';
+import { industryJourneys } from './data';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-interface ChannelStep {
+interface Step {
   Goal: string;
   Prompt: string;
   Type?: string;
@@ -17,18 +16,12 @@ interface IndustryJourney {
   name: string;
   use_case: string;
   steps: {
-    [channel: string]: ChannelStep;
+    [key: string]: Step;
   };
 }
 
 interface IndustryJourneys {
-  industries: Array<{
-    name: string;
-    use_case: string;
-    steps: {
-      [key: string]: ChannelStep;
-    };
-  }>;
+  industries: IndustryJourney[];
 }
 
 // Cache for industry journeys
@@ -45,44 +38,11 @@ const defaultPrompts = {
 };
 
 function getIndustryJourneys(): IndustryJourneys {
-  if (!journeyCache) {
-    // Try multiple possible paths for the JSON file
-    const possiblePaths = [
-      path.join(__dirname, 'industry_journeys.json'),
-      path.join(__dirname, '..', 'industry_journeys.json'),
-      path.join(process.cwd(), 'netlify', 'functions', 'industry_journeys.json')
-    ];
-
-    let content: string | null = null;
-    let usedPath: string | null = null;
-
-    // Try each path until we find one that works
-    for (const journeyPath of possiblePaths) {
-      try {
-        content = fs.readFileSync(journeyPath, 'utf-8');
-        usedPath = journeyPath;
-        console.log('Successfully loaded industry_journeys.json from:', journeyPath);
-        break;
-      } catch (error) {
-        console.log('Failed to load from path:', journeyPath);
-      }
-    }
-
-    if (!content) {
-      throw new Error('Could not find industry_journeys.json in any expected location');
-    }
-
-    const parsed = JSON.parse(content) as IndustryJourneys;
-    journeyCache = parsed;
-    console.log('Loaded industry journeys from:', usedPath);
-    console.log('Available industries:', parsed.industries.map(j => j.name));
-  }
-  return journeyCache as IndustryJourneys;
+  return industryJourneys;
 }
 
 function findJourney(industry: string): IndustryJourney | undefined {
-  const journeys = getIndustryJourneys();
-  return journeys.industries.find(j => j.name === industry);
+  return getIndustryJourneys().industries.find(j => j.name === industry);
 }
 
 interface ContentResponse {

@@ -1,4 +1,22 @@
-{
+interface Step {
+  Goal: string;
+  Prompt: string;
+  Type?: string;
+}
+
+interface IndustryJourney {
+  name: string;
+  use_case: string;
+  steps: {
+    [key: string]: Step;
+  };
+}
+
+interface IndustryJourneys {
+  industries: IndustryJourney[];
+}
+
+export const industryJourneys: IndustryJourneys = {
   "industries": [
     {
       "name": "Retail & Consumer Goods",
@@ -103,4 +121,4 @@
       }
     }
   ]
-} 
+}; 
