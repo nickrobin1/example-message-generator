@@ -76,13 +76,25 @@ export async function generateMarketingContent(
         .map(step => channelMap[step as keyof typeof channelMap])
         .filter(Boolean);
 
-      // Set individual flags
+      // Set individual flags and goals
       in_pitch_flags.sms_in_pitch = 'SMS' in steps;
       in_pitch_flags.push_in_pitch = 'Push' in steps;
       in_pitch_flags.email_in_pitch = 'Email' in steps;
       in_pitch_flags.card_in_pitch = 'Content Card' in steps;
       in_pitch_flags.in_app_in_pitch = 'In-App' in steps;
       in_pitch_flags.whatsapp_in_pitch = 'WhatsApp' in steps;
+
+      // Set goals from steps
+      const goals = {
+        smsGoal: steps['SMS']?.Goal,
+        pushGoal: steps['Push']?.Goal,
+        emailGoal: steps['Email']?.Goal,
+        cardGoal: steps['Content Card']?.Goal,
+        inAppGoal: steps['In-App']?.Goal,
+        whatsappGoal: steps['WhatsApp']?.Goal,
+      };
+
+      Object.assign(in_pitch_flags, goals);
     }
 
     console.log('Making API request to generate-content...');

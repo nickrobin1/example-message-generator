@@ -39,6 +39,13 @@ export interface MarketingContent {
   in_app_in_pitch?: boolean;
   whatsapp_in_pitch?: boolean;
   channel_order?: string[];
+  // Channel goals from industry journey steps
+  smsGoal?: string;
+  pushGoal?: string;
+  emailGoal?: string;
+  cardGoal?: string;
+  inAppGoal?: string;
+  whatsappGoal?: string;
 }
 
 export interface BrandFetchResponse {

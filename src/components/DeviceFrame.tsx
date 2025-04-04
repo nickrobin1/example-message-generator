@@ -9,9 +9,10 @@ interface DeviceFrameProps {
   children: React.ReactNode;
   title: React.ReactNode;
   content: MarketingContent;
+  hideExport?: boolean;
 }
 
-const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) => {
+const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hideExport = false }) => {
   const deviceRef = useRef<HTMLDivElement>(null);
   const [isCopying, setIsCopying] = React.useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -117,6 +118,8 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
   };
 
   const renderButtons = () => {
+    if (hideExport) return null;
+
     if (variant === 'hover') {
       return isHovered && !isCapturing ? (
         <div 
@@ -179,13 +182,13 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content }) =
     <div className="max-w-[375px] mx-auto">
       <div className="flex justify-between items-center mb-2">
         {title}
-        {variant !== 'hover' && renderButtons()}
+        {!hideExport && variant !== 'hover' && renderButtons()}
       </div>
       <div 
         ref={deviceRef} 
         className="rounded-[3rem] bg-white/50 p-4 shadow-xl border border-white"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => !hideExport && setIsHovered(true)}
+        onMouseLeave={() => !hideExport && setIsHovered(false)}
       >
         <div className="relative rounded-[2rem] overflow-hidden h-[700px] bg-white">
           {children}
