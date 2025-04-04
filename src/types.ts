@@ -32,6 +32,13 @@ export interface MarketingContent {
   smsIcon?: string;
   pushIcon?: string;
   whatsappIcon?: string;
+  sms_in_pitch?: boolean;
+  push_in_pitch?: boolean;
+  email_in_pitch?: boolean;
+  card_in_pitch?: boolean;
+  in_app_in_pitch?: boolean;
+  whatsapp_in_pitch?: boolean;
+  channel_order?: string[];
 }
 
 export interface BrandFetchResponse {

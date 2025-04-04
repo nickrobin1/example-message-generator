@@ -32,6 +32,7 @@ import { extractDominantColor } from './utils/color';
 import WhatsAppEditor from './components/channels/WhatsAppEditor';
 import WhatsAppPreview from './components/channels/WhatsAppPreview';
 import { CardPreview } from './components/channels/CardPreview';
+import PitchViewExport from './components/PitchViewExport';
 
 // Use current origin in production, fallback to localhost for development
 const API_BASE_URL = import.meta.env.PROD 
@@ -79,6 +80,12 @@ function App() {
     push: '',
     whatsapp: ''
   });
+  const [previewMode, setPreviewMode] = useState<'single' | 'pitch'>('single');
+  const smsPreviewRef = useRef<HTMLDivElement>(null);
+  const pushPreviewRef = useRef<HTMLDivElement>(null);
+  const emailPreviewRef = useRef<HTMLDivElement>(null);
+  const cardPreviewRef = useRef<HTMLDivElement>(null);
+  const inAppPreviewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -404,7 +411,13 @@ function App() {
 
         <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
-          <div className="space-y-6">
+          <div 
+            className={`space-y-6 transition-all duration-500 ease-in-out ${
+              previewMode === 'pitch' 
+                ? 'lg:translate-x-[-100%] lg:opacity-0 lg:absolute' 
+                : 'lg:translate-x-0 lg:opacity-100 lg:relative'
+            }`}
+          >
             <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
               <h2 className="text-xl font-semibold mb-2 text-[#3D1D72]">Brand Assets</h2>
               <p className="text-gray-400 text-sm font-light mb-6">Enter a domain name to automatically generate some example messages, or manually enter brand info below:</p>
@@ -588,127 +601,315 @@ function App() {
           </div>
 
           {/* Preview Section */}
-          <div className="space-y-8">
-            {activeChannel === 'sms' && (
-              <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">SMS Preview</h2>} content={content}>
-                <SMSPreview content={content} />
-              </DeviceFrame>
-            )}
+          <div 
+            className={`space-y-8 transition-all duration-500 ease-in-out ${
+              previewMode === 'pitch' 
+                ? 'lg:col-span-2' 
+                : 'lg:col-span-1'
+            }`}
+          >
+            {/* Preview Mode Toggle */}
+            <div className="flex justify-center">
+              <div className="inline-flex p-1 space-x-1 bg-white rounded-lg shadow-sm">
+                <button
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    previewMode === 'single'
+                      ? 'bg-[#3D1D72] text-white'
+                      : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+                  }`}
+                  onClick={() => setPreviewMode('single')}
+                >
+                  <span>Single</span>
+                </button>
+                <button
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    previewMode === 'pitch'
+                      ? 'bg-[#3D1D72] text-white'
+                      : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+                  }`}
+                  onClick={() => setPreviewMode('pitch')}
+                >
+                  <span>Pitch View</span>
+                </button>
+              </div>
+            </div>
 
-            {activeChannel === 'push' && (
-              <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Push Notification Preview</h2>} content={content}>
-                <div className="relative h-full">
-                  {/* Gradient Background */}
-                  <div 
-                    className="absolute inset-0 w-full h-full"
-                    style={{
-                      background: `
-                        radial-gradient(circle at 70% 20%, #FF6B00 0%, transparent 50%),
-                        radial-gradient(circle at 20% 40%, #FFD600 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, #FF4D6B 0%, transparent 50%),
-                        radial-gradient(circle at 40% 90%, #FF2D87 0%, transparent 50%),
-                        linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%)
-                      `
-                    }}
-                  />
+            {previewMode === 'pitch' ? (
+              <PitchViewExport content={content}>
+                <div className="grid auto-cols-fr grid-flow-col gap-2">
+                  {content.channel_order?.map(channel => {
+                    switch (channel) {
+                      case 'sms':
+                        return content.sms_in_pitch && (
+                          <div key="sms">
+                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">SMS</h2>} content={content}>
+                              <div className="scale-75 origin-top-left">
+                                <SMSPreview content={content} />
+                              </div>
+                            </DeviceFrame>
+                          </div>
+                        );
+                      case 'push':
+                        return content.push_in_pitch && (
+                          <div key="push">
+                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">Push</h2>} content={content}>
+                              <div className="scale-75 origin-top-left">
+                                <div className="relative h-full">
+                                  {/* Gradient Background */}
+                                  <div 
+                                    className="absolute inset-0 w-full h-full"
+                                    style={{
+                                      background: `
+                                        radial-gradient(circle at 70% 20%, #FF6B00 0%, transparent 50%),
+                                        radial-gradient(circle at 20% 40%, #FFD600 0%, transparent 50%),
+                                        radial-gradient(circle at 80% 80%, #FF4D6B 0%, transparent 50%),
+                                        radial-gradient(circle at 40% 90%, #FF2D87 0%, transparent 50%),
+                                        linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%)
+                                      `
+                                    }}
+                                  />
 
-                  {/* Lock Icon */}
-                  <img
-                    src={lockIcon}
-                    alt="Lock"
-                    className="absolute top-12 left-1/2 transform -translate-x-1/2 w-4 h-4"
-                  />
+                                  {/* Lock Icon */}
+                                  <img
+                                    src={lockIcon}
+                                    alt="Lock"
+                                    className="absolute top-12 left-1/2 transform -translate-x-1/2 w-4 h-4"
+                                  />
 
-                  {/* Time */}
-                  <div className="absolute inset-x-0 top-20 text-center text-white">
-                    <img
-                      src={timeIcon}
-                      alt="9:41"
-                      className="w-[72px] mx-auto"
-                    />
-                    <div className="text-[22px] font-normal mt-1 ios-display">Monday, June 3</div>
-                  </div>
+                                  {/* Time */}
+                                  <div className="absolute inset-x-0 top-20 text-center text-white">
+                                    <img
+                                      src={timeIcon}
+                                      alt="9:41"
+                                      className="w-[72px] mx-auto"
+                                    />
+                                    <div className="text-[22px] font-normal mt-1 ios-display">Monday, June 3</div>
+                                  </div>
 
-                  {/* iOS Notification */}
-                  <div className="absolute inset-x-4 top-[180px]">
-                    <div 
-                      className="w-full rounded-[16px] p-[14px] ios-font"
-                      style={{ 
-                        background: 'rgba(245, 245, 245, 0.3)',
-                        backdropFilter: 'blur(25px)',
-                        WebkitBackdropFilter: 'blur(25px)',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                      }}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                          {content.logoUrl ? (
-                            <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
-                              <img 
-                                src={content.logoUrl} 
-                                alt={content.brandName}
-                                className="max-w-full max-h-full object-contain"
-                              />
+                                  {/* iOS Notification */}
+                                  <div className="absolute inset-x-4 top-[180px]">
+                                    <div 
+                                      className="w-full rounded-[16px] p-[14px] ios-font"
+                                      style={{ 
+                                        background: 'rgba(245, 245, 245, 0.3)',
+                                        backdropFilter: 'blur(25px)',
+                                        WebkitBackdropFilter: 'blur(25px)',
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                                      }}
+                                    >
+                                      <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                                          {content.logoUrl ? (
+                                            <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
+                                              <img 
+                                                src={content.logoUrl} 
+                                                alt={content.brandName}
+                                                className="max-w-full max-h-full object-contain"
+                                              />
+                                            </div>
+                                          ) : (
+                                            <div className="w-[48px] h-[48px] rounded-[12px] bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                              <Building2 className="w-6 h-6 text-gray-400" />
+                                            </div>
+                                          )}
+                                          <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                            <span className="text-[15px] font-semibold leading-none">{content.brandName || '{{Brand Name}}'}</span>
+                                            <p className="text-[15px] leading-[1.2] text-black">
+                                              {content.pushMessage || 'Your message will appear here'}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <span className="text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Bottom Swipe Indicator */}
+                                  <div className="absolute inset-x-0 bottom-6 flex flex-col items-center space-y-2">
+                                    <div className="flex justify-between w-72">
+                                      <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
+                                      <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
+                                    </div>
+                                    <div className="text-white/60 text-sm ios-font mt-4">swipe up to open</div>
+                                    <div className="w-32 h-1 bg-white rounded-full mt-2" />
+                                  </div>
+                                </div>
+                              </div>
+                            </DeviceFrame>
+                          </div>
+                        );
+                      case 'email':
+                        return content.email_in_pitch && (
+                          <div key="email">
+                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">Email</h2>} content={content}>
+                              <div className="scale-75 origin-top-left">
+                                <EmailPreview content={content} />
+                              </div>
+                            </DeviceFrame>
+                          </div>
+                        );
+                      case 'card':
+                        return content.card_in_pitch && (
+                          <div key="card">
+                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">Card</h2>} content={content}>
+                              <div className="scale-75 origin-top-left">
+                                <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
+                                  <CardPreview content={content} />
+                                </div>
+                              </div>
+                            </DeviceFrame>
+                          </div>
+                        );
+                      case 'in_app':
+                        return content.in_app_in_pitch && (
+                          <div key="in_app">
+                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">In-App</h2>} content={content}>
+                              <div className="scale-75 origin-top-left">
+                                <div className="bg-white h-full">
+                                  <InAppPreview 
+                                    content={content} 
+                                    onContentChange={handleInputChange}
+                                  />
+                                </div>
+                              </div>
+                            </DeviceFrame>
+                          </div>
+                        );
+                      case 'whatsapp':
+                        return content.whatsapp_in_pitch && (
+                          <div key="whatsapp">
+                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">WhatsApp</h2>} content={content}>
+                              <div className="scale-75 origin-top-left">
+                                <WhatsAppPreview content={content} />
+                              </div>
+                            </DeviceFrame>
+                          </div>
+                        );
+                      default:
+                        return null;
+                    }
+                  })}
+                </div>
+              </PitchViewExport>
+            ) : (
+              <>
+                {activeChannel === 'sms' && (
+                  <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">SMS Preview</h2>} content={content}>
+                    <SMSPreview content={content} />
+                  </DeviceFrame>
+                )}
+                {activeChannel === 'push' && (
+                  <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Push Notification Preview</h2>} content={content}>
+                    <div className="relative h-full">
+                      {/* Gradient Background */}
+                      <div 
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          background: `
+                            radial-gradient(circle at 70% 20%, #FF6B00 0%, transparent 50%),
+                            radial-gradient(circle at 20% 40%, #FFD600 0%, transparent 50%),
+                            radial-gradient(circle at 80% 80%, #FF4D6B 0%, transparent 50%),
+                            radial-gradient(circle at 40% 90%, #FF2D87 0%, transparent 50%),
+                            linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%)
+                          `
+                        }}
+                      />
+
+                      {/* Lock Icon */}
+                      <img
+                        src={lockIcon}
+                        alt="Lock"
+                        className="absolute top-12 left-1/2 transform -translate-x-1/2 w-4 h-4"
+                      />
+
+                      {/* Time */}
+                      <div className="absolute inset-x-0 top-20 text-center text-white">
+                        <img
+                          src={timeIcon}
+                          alt="9:41"
+                          className="w-[72px] mx-auto"
+                        />
+                        <div className="text-[22px] font-normal mt-1 ios-display">Monday, June 3</div>
+                      </div>
+
+                      {/* iOS Notification */}
+                      <div className="absolute inset-x-4 top-[180px]">
+                        <div 
+                          className="w-full rounded-[16px] p-[14px] ios-font"
+                          style={{ 
+                            background: 'rgba(245, 245, 245, 0.3)',
+                            backdropFilter: 'blur(25px)',
+                            WebkitBackdropFilter: 'blur(25px)',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3 flex-1 min-w-0">
+                              {content.logoUrl ? (
+                                <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
+                                  <img 
+                                    src={content.logoUrl} 
+                                    alt={content.brandName}
+                                    className="max-w-full max-h-full object-contain"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-[48px] h-[48px] rounded-[12px] bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                  <Building2 className="w-6 h-6 text-gray-400" />
+                                </div>
+                              )}
+                              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                <span className="text-[15px] font-semibold leading-none">{content.brandName || '{{Brand Name}}'}</span>
+                                <p className="text-[15px] leading-[1.2] text-black">
+                                  {content.pushMessage || 'Your message will appear here'}
+                                </p>
+                              </div>
                             </div>
-                          ) : (
-                            <div className="w-[48px] h-[48px] rounded-[12px] bg-gray-100 flex items-center justify-center flex-shrink-0">
-                              <Building2 className="w-6 h-6 text-gray-400" />
-                            </div>
-                          )}
-                          <div className="flex flex-col gap-1 flex-1 min-w-0">
-                            <span className="text-[15px] font-semibold leading-none">{content.brandName || '{{Brand Name}}'}</span>
-                            <p className="text-[15px] leading-[1.2] text-black">
-                              {content.pushMessage || 'Your message will appear here'}
-                            </p>
+                            <span className="text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
                           </div>
                         </div>
-                        <span className="text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
+                      </div>
+
+                      {/* Bottom Swipe Indicator */}
+                      <div className="absolute inset-x-0 bottom-6 flex flex-col items-center space-y-2">
+                        <div className="flex justify-between w-72">
+                          <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
+                          <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
+                        </div>
+                        <div className="text-white/60 text-sm ios-font mt-4">swipe up to open</div>
+                        <div className="w-32 h-1 bg-white rounded-full mt-2" />
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bottom Swipe Indicator */}
-                  <div className="absolute inset-x-0 bottom-6 flex flex-col items-center space-y-2">
-                    <div className="flex justify-between w-72">
-                      <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
-                      <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
+                  </DeviceFrame>
+                )}
+                {activeChannel === 'email' && (
+                  <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Email Preview</h2>} content={content}>
+                    <EmailPreview content={content} />
+                  </DeviceFrame>
+                )}
+                {activeChannel === 'card' && (
+                  <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Card Preview</h2>} content={content}>
+                    <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
+                      <CardPreview content={content} />
                     </div>
-                    <div className="text-white/60 text-sm ios-font mt-4">swipe up to open</div>
-                    <div className="w-32 h-1 bg-white rounded-full mt-2" />
-                  </div>
-                </div>
-              </DeviceFrame>
-            )}
-
-            {activeChannel === 'email' && (
-              <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Email Preview</h2>} content={content}>
-                <EmailPreview content={content} />
-              </DeviceFrame>
-            )}
-
-            {activeChannel === 'card' && (
-              <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">Card Preview</h2>} content={content}>
-                <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
-                  <CardPreview content={content} />
-                </div>
-              </DeviceFrame>
-            )}
-
-            {activeChannel === 'in-app' && (
-              <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">In-App Preview</h2>} content={content}>
-                <div className="bg-white h-full">
-                  <InAppPreview 
-                    content={content} 
-                    onContentChange={handleInputChange}
-                  />
-                </div>
-              </DeviceFrame>
-            )}
-
-            {activeChannel === 'whatsapp' && (
-              <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">WhatsApp Preview</h2>} content={content}>
-                <WhatsAppPreview content={content} />
-              </DeviceFrame>
+                  </DeviceFrame>
+                )}
+                {activeChannel === 'in-app' && (
+                  <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">In-App Preview</h2>} content={content}>
+                    <div className="bg-white h-full">
+                      <InAppPreview 
+                        content={content} 
+                        onContentChange={handleInputChange}
+                      />
+                    </div>
+                  </DeviceFrame>
+                )}
+                {activeChannel === 'whatsapp' && (
+                  <DeviceFrame title={<h2 className="text-xl font-semibold text-[#3D1D72]">WhatsApp Preview</h2>} content={content}>
+                    <WhatsAppPreview content={content} />
+                  </DeviceFrame>
+                )}
+              </>
             )}
           </div>
         </div>

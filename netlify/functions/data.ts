@@ -82,6 +82,11 @@ export const industryJourneys: IndustryJourneys = {
       "name": "Financial Services",
       "use_case": "Drive Direct Deposit Set-Up",
       "steps": {
+        "In-App": {
+            "Goal": "Prime for Push Opt-In",
+            "Prompt": "Create an in-app message that educates user on benefits of opting into push notifications with this brand and asks them to opt in.",
+            "Type": "Modal with Logo"
+        },
         "Push": {
           "Goal": "Nudge setup for direct deposit",
           "Prompt": "Write a concise push notification that highlights the convenience and speed of setting up direct deposit."
@@ -93,11 +98,6 @@ export const industryJourneys: IndustryJourneys = {
         "Email": {
           "Goal": "Confirm setup success",
           "Prompt": "Write a confirmation email thanking the user for setting up direct deposit and outlining what happens next."
-        },
-        "In-App": {
-          "Goal": "Prime for Push Opt-In",
-          "Prompt": "Create an in-app message that educates user on benefits of opting into push notifications with this brand and asks them to opt in.",
-          "Type": "Modal with Logo"
         }
       }
     },
