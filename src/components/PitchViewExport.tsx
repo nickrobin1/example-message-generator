@@ -57,10 +57,8 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) 
       const image = await captureGrid();
       if (!image) return;
 
-      // Create a blob from the image
       const blob = await fetch(image).then(res => res.blob());
       
-      // Copy the image to clipboard
       await navigator.clipboard.write([
         new ClipboardItem({
           [blob.type]: blob
@@ -69,7 +67,6 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) 
 
       analytics.trackCopyClick('pitch-view');
       
-      // Reset the copying state after a short delay to show the checkmark
       setTimeout(() => {
         setIsCopying(false);
       }, 1000);
@@ -87,10 +84,10 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) 
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-end gap-4 mb-4">
         <button
           onClick={handleCopy}
-          className="bg-white text-gray-900 px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors shadow-sm"
+          className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors shadow-sm"
           title="Copy preview"
           disabled={isCapturing}
         >
@@ -102,13 +99,13 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) 
           ) : (
             <>
               <Copy className="w-5 h-5" />
-              <span>Copy to clipboard</span>
+              <span>Copy</span>
             </>
           )}
         </button>
         <button
           onClick={handleDownload}
-          className="bg-white text-gray-900 px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors shadow-sm"
+          className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors shadow-sm"
           title="Download preview"
           disabled={isCapturing}
         >
@@ -116,8 +113,41 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) 
           <span>Download</span>
         </button>
       </div>
-      <div ref={gridRef} className="bg-[#F8F7FF] p-4 rounded-lg">
-        {children}
+      <div 
+        ref={gridRef} 
+        className="bg-white rounded-lg overflow-hidden border border-gray-200"
+        style={{ 
+          aspectRatio: '16/9',
+          width: '100%',
+          maxWidth: '1920px',
+          margin: '0 auto'
+        }}
+      >
+        <div className="p-8 h-full flex flex-col">
+          {/* Header */}
+          <div className="flex items-center gap-6 mb-8">
+            {content.logoUrl && (
+              <img 
+                src={content.logoUrl} 
+                alt={content.brandName}
+                className="w-16 h-16 object-contain"
+              />
+            )}
+            <div>
+              <h1 className="text-3xl font-bold text-[#3D1D72]">
+                Cross-Channel Customer Journey
+              </h1>
+              <p className="text-lg text-gray-600 mt-1">
+                {content.useCase}
+              </p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1">
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -636,24 +636,26 @@ function App() {
 
             {previewMode === 'pitch' ? (
               <PitchViewExport content={content}>
-                <div className="grid auto-cols-fr grid-flow-col gap-2">
+                <div className="grid grid-cols-4 gap-8">
                   {content.channel_order?.map(channel => {
                     switch (channel) {
                       case 'sms':
                         return content.sms_in_pitch && (
-                          <div key="sms">
-                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">SMS</h2>} content={content}>
-                              <div className="scale-75 origin-top-left">
+                          <div key="sms" className="flex flex-col items-center">
+                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.smsGoal || 'SMS'}</h3>
+                            <div className="transform scale-75 origin-top">
+                              <DeviceFrame title={null} content={content} hideExport>
                                 <SMSPreview content={content} />
-                              </div>
-                            </DeviceFrame>
+                              </DeviceFrame>
+                            </div>
                           </div>
                         );
                       case 'push':
                         return content.push_in_pitch && (
-                          <div key="push">
-                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">Push</h2>} content={content}>
-                              <div className="scale-75 origin-top-left">
+                          <div key="push" className="flex flex-col items-center">
+                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.pushGoal || 'Push'}</h3>
+                            <div className="transform scale-75 origin-top">
+                              <DeviceFrame title={null} content={content} hideExport>
                                 <div className="relative h-full">
                                   {/* Gradient Background */}
                                   <div 
@@ -734,55 +736,59 @@ function App() {
                                     <div className="w-32 h-1 bg-white rounded-full mt-2" />
                                   </div>
                                 </div>
-                              </div>
-                            </DeviceFrame>
+                              </DeviceFrame>
+                            </div>
                           </div>
                         );
                       case 'email':
                         return content.email_in_pitch && (
-                          <div key="email">
-                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">Email</h2>} content={content}>
-                              <div className="scale-75 origin-top-left">
+                          <div key="email" className="flex flex-col items-center">
+                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.emailGoal || 'Email'}</h3>
+                            <div className="transform scale-75 origin-top">
+                              <DeviceFrame title={null} content={content} hideExport>
                                 <EmailPreview content={content} />
-                              </div>
-                            </DeviceFrame>
+                              </DeviceFrame>
+                            </div>
                           </div>
                         );
                       case 'card':
                         return content.card_in_pitch && (
-                          <div key="card">
-                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">Card</h2>} content={content}>
-                              <div className="scale-75 origin-top-left">
+                          <div key="card" className="flex flex-col items-center">
+                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.cardGoal || 'Card'}</h3>
+                            <div className="transform scale-75 origin-top">
+                              <DeviceFrame title={null} content={content} hideExport>
                                 <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
                                   <CardPreview content={content} />
                                 </div>
-                              </div>
-                            </DeviceFrame>
+                              </DeviceFrame>
+                            </div>
                           </div>
                         );
                       case 'in_app':
                         return content.in_app_in_pitch && (
-                          <div key="in_app">
-                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">In-App</h2>} content={content}>
-                              <div className="scale-75 origin-top-left">
-                                <div className="bg-white h-full">
+                          <div key="in_app" className="flex flex-col items-center">
+                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.inAppGoal || 'In-App'}</h3>
+                            <div className="transform scale-75 origin-top">
+                              <DeviceFrame title={null} content={content} hideExport>
+                                <div className="bg-white h-full w-full">
                                   <InAppPreview 
                                     content={content} 
                                     onContentChange={handleInputChange}
                                   />
                                 </div>
-                              </div>
-                            </DeviceFrame>
+                              </DeviceFrame>
+                            </div>
                           </div>
                         );
                       case 'whatsapp':
                         return content.whatsapp_in_pitch && (
-                          <div key="whatsapp">
-                            <DeviceFrame title={<h2 className="text-sm font-semibold text-[#3D1D72]">WhatsApp</h2>} content={content}>
-                              <div className="scale-75 origin-top-left">
+                          <div key="whatsapp" className="flex flex-col items-center">
+                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.whatsappGoal || 'WhatsApp'}</h3>
+                            <div className="transform scale-75 origin-top">
+                              <DeviceFrame title={null} content={content} hideExport>
                                 <WhatsAppPreview content={content} />
-                              </div>
-                            </DeviceFrame>
+                              </DeviceFrame>
+                            </div>
                           </div>
                         );
                       default:
