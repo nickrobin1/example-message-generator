@@ -701,8 +701,9 @@ function App() {
                                           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                                         }}
                                       >
-                                        {/* Notification inner content (remains flex) */}
-                                        <div className="flex items-start justify-between gap-3">
+                                        {/* Notification inner content: Change to relative, timestamp absolute */}
+                                        <div className="relative flex items-start gap-3">
+                                          {/* Left Side: Icon + Text (Takes full width now) */}
                                           <div className="flex items-start gap-3 flex-1 min-w-0">
                                             {content.logoUrl ? (
                                               <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
@@ -724,7 +725,8 @@ function App() {
                                               </p>
                                             </div>
                                           </div>
-                                          <span className="text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
+                                          {/* Right Side: Timestamp (Absolute position) */}
+                                          <span className="absolute top-0 right-0 text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
                                         </div>
                                       </div>
                                     </div>
@@ -856,8 +858,9 @@ function App() {
                               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                             }}
                           >
-                            {/* Notification inner content (remains flex) */}
-                            <div className="flex items-start justify-between gap-3">
+                            {/* Notification inner content: Change to relative, timestamp absolute */}
+                            <div className="relative flex items-start gap-3">
+                              {/* Left Side: Icon + Text (Takes full width now) */}
                               <div className="flex items-start gap-3 flex-1 min-w-0">
                                 {content.logoUrl ? (
                                   <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
@@ -879,7 +882,8 @@ function App() {
                                   </p>
                                 </div>
                               </div>
-                              <span className="text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
+                              {/* Right Side: Timestamp (Absolute position) */}
+                              <span className="absolute top-0 right-0 text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
                             </div>
                           </div>
                         </div>
