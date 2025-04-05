@@ -12,8 +12,9 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
     switch (content.inAppType) {
       case 'modal-logo':
         return (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-[300px] relative">
+          <div className="w-full h-full flex items-center justify-center p-4 z-10">
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative z-10">
               <button className="absolute right-4 top-4">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
@@ -44,8 +45,9 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
 
       case 'modal-image':
         return (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-[300px] relative overflow-hidden">
+          <div className="w-full h-full flex items-center justify-center p-4 z-10">
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative overflow-hidden z-10">
               <button className="absolute right-4 top-4 z-10">
                 <X className="w-6 h-6 text-white" />
               </button>
@@ -70,8 +72,8 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
 
       case 'fullscreen':
         return (
-          <div className="absolute inset-0 bg-white">
-            <div className="relative h-full flex flex-col">
+          <div className="w-full h-full flex flex-col z-10 bg-white">
+            <div className="relative flex-1 flex flex-col">
               <button className="absolute right-4 top-4 z-10">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
@@ -98,8 +100,9 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
 
       case 'survey':
         return (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-[300px] relative">
+          <div className="w-full h-full flex items-center justify-center p-4 z-10">
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative z-10">
               <button className="absolute right-4 top-4">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
@@ -143,8 +146,9 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
 
       case 'email-phone-capture':
         return (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-[300px] relative">
+          <div className="w-full h-full flex items-center justify-center p-4 z-10">
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="bg-white rounded-2xl w-full max-w-[300px] relative z-10">
               <button className="absolute right-4 top-4">
                 <X className="w-6 h-6 text-gray-400" />
               </button>
@@ -200,10 +204,10 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
   };
 
   return (
-    <div className="bg-gray-100 h-full relative overflow-hidden">
+    <div className="bg-gray-100 h-full relative overflow-hidden flex flex-col items-center justify-center">
       {/* App Background */}
       {content.inAppBackgroundImage ? (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 z-0">
           <img 
             src={content.inAppBackgroundImage} 
             alt="App Background" 
@@ -211,7 +215,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
           />
         </div>
       ) : (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 z-0">
           <div className="p-4">
             <div className="w-2/3 h-4 bg-gray-200 rounded-full mb-3" />
             <div className="w-1/2 h-4 bg-gray-200 rounded-full" />
@@ -224,7 +228,7 @@ const InAppPreview: React.FC<InAppPreviewProps> = ({ content, onContentChange })
         </div>
       )}
       
-      {/* In-App Message */}
+      {/* In-App Message Content (Now uses flex positioning from renderContent) */}
       {renderContent()}
     </div>
   );
