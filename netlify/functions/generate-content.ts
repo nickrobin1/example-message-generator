@@ -177,9 +177,7 @@ export const handler: Handler = async (event) => {
     console.log('Mapped In-App Type:', mappedInAppType);
 
     const response = await openai.chat.completions.create({
-      // @cursor-skip
-      model: 'gpt-4o-mini',
-      // @cursor-end-skip
+      model: 'gpt-3.5-turbo',
       messages: [
         {
           role: 'system',
@@ -243,7 +241,7 @@ export const handler: Handler = async (event) => {
           industry: journey?.name || industry,
           useCase: journey?.use_case || 'Custom',
           generatedAt: new Date().toISOString(),
-          model: 'gpt-4',
+          model: 'gpt-3.5-turbo',
           confidence: 0.9
         }
       })

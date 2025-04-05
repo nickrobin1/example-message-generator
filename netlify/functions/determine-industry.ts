@@ -92,9 +92,7 @@ export const handler: Handler = async (event) => {
 
     // Make the OpenAI API call
     const completion = await openai.chat.completions.create({
-          // @cursor-skip
-          model: 'gpt-4o-mini',
-          // @cursor-end-skip
+      model: 'gpt-3.5-turbo',
       messages: [
         {
           role: "system",
