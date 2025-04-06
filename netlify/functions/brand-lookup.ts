@@ -52,6 +52,30 @@ const getPrimaryColor = (colors: any[]) => {
   return selectedColor?.hex || null;
 };
 
+// Helper function to get a content image
+const getContentImage = (images: any[]) => {
+  console.log('Processing content images:', images);
+  if (!images?.length) {
+    console.log('No content images found');
+    return null;
+  }
+
+  // Look for banner or background images first as they're typically good for content
+  const bannerImage = images.find(img => img.type === 'banner');
+  const backgroundImage = images.find(img => img.type === 'background');
+  const selectedImage = bannerImage || backgroundImage || images[0];
+
+  if (!selectedImage?.formats?.length) {
+    console.log('No formats found for selected image');
+    return null;
+  }
+
+  // Get the first format - Brandfetch typically provides optimized images
+  const imageUrl = selectedImage.formats[0].src;
+  console.log('Selected content image:', imageUrl);
+  return imageUrl;
+};
+
 export const handler: Handler = async (event) => {
   console.log('Received request:', {
     method: event.httpMethod,
@@ -121,7 +145,8 @@ export const handler: Handler = async (event) => {
         })) || []
       },
       description: data.description || '',
-      longDescription: data.longDescription || data.description || ''
+      longDescription: data.longDescription || data.description || '',
+      contentImage: getContentImage(data.images)
     };
 
     console.log('Processed brand data:', brandData);

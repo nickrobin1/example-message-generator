@@ -11,12 +11,12 @@ export interface MarketingContent {
   pushMessage: string;
   cardTitle: string;
   cardDescription: string;
-  cardImage?: string;
+  cardImage: string;
   inAppTitle: string;
   inAppBody: string;
   inAppCtaText: string;
   inAppType?: string;
-  inAppImage?: string;
+  inAppImage: string;
   inAppBackgroundImage?: string;
   inAppSurveyOptions: string[];
   inAppSelectedOptions: string[];
@@ -29,9 +29,9 @@ export interface MarketingContent {
   emailHeadline: string;
   emailBody: string;
   emailCta: string;
-  smsIcon?: string;
-  pushIcon?: string;
-  whatsappIcon?: string;
+  smsIcon: string;
+  pushIcon: string;
+  whatsappIcon: string;
   sms_in_pitch?: boolean;
   push_in_pitch?: boolean;
   email_in_pitch?: boolean;
@@ -46,6 +46,7 @@ export interface MarketingContent {
   cardGoal?: string;
   inAppGoal?: string;
   whatsappGoal?: string;
+  emailImage: string;
 }
 
 export interface BrandFetchResponse {
@@ -54,9 +55,10 @@ export interface BrandFetchResponse {
   logo: string;
   description?: string;
   longDescription?: string;
+  contentImage?: string;
   colors?: {
     primary: string;
-    all: Array<{ hex: string; type: string; brightness: number }>;
+    all: Array<{ hex: string; type: string }>;
   };
 }
 

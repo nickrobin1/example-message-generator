@@ -50,9 +50,15 @@ function App() {
   const domainInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState<MarketingContent>({
     brandName: '',
-    logoUrl: '',
     brandDescription: '',
     brandColor: '#3D1D72',
+    logoUrl: '',
+    smsIcon: '',
+    pushIcon: '',
+    whatsappIcon: '',
+    emailImage: '',
+    cardImage: '',
+    inAppImage: '',
     industry: '',
     useCase: '',
     whatsappMessage: 'Hey there! 👋 Check out our latest offers just for you. Click here to explore more.',
@@ -207,6 +213,9 @@ function App() {
         whatsappIcon: seedData.logo,
         brandDescription: seedData.longDescription,
         brandColor: seedData.colors?.primary || '#3D1D72',
+        emailImage: seedData.contentImage || prev.emailImage,
+        cardImage: seedData.contentImage || prev.cardImage,
+        inAppImage: seedData.contentImage || prev.inAppImage
       }));
 
       showToast('Brand information updated successfully!', 'success');
@@ -265,6 +274,9 @@ function App() {
         whatsappIcon: data.logo || prev.whatsappIcon,
         brandDescription: description,
         brandColor: data.colors?.primary || '#3D1D72',
+        emailImage: data.contentImage || prev.emailImage,
+        cardImage: data.contentImage || prev.cardImage,
+        inAppImage: data.contentImage || prev.inAppImage
       }));
 
       // Determine industry after successful brand lookup
