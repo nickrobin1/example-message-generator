@@ -3,13 +3,15 @@ import { Download, Copy, Check } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { analytics } from '../lib/analytics';
 import type { MarketingContent } from '../types';
+import DeviceFrame from './DeviceFrame';
 
 interface PitchViewExportProps {
   content: MarketingContent;
   children: React.ReactNode;
+  isLoading?: boolean;
 }
 
-const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) => {
+const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, isLoading = false }) => {
   const [isCopying, setIsCopying] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);

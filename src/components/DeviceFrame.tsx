@@ -10,9 +10,10 @@ interface DeviceFrameProps {
   title: React.ReactNode;
   content: MarketingContent;
   hideExport?: boolean;
+  isLoading?: boolean;
 }
 
-const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hideExport = false }) => {
+const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hideExport = false, isLoading = false }) => {
   const deviceRef = useRef<HTMLDivElement>(null);
   const [isCopying, setIsCopying] = React.useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -191,7 +192,16 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
         onMouseLeave={() => !hideExport && setIsHovered(false)}
       >
         <div className="relative rounded-[2rem] overflow-hidden h-[700px] bg-white">
-          {children}
+          {/* Loading Overlay */}
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+              <div className="w-10 h-10 border-4 border-[#3D1D72] border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+          {/* Actual screen content */}
+          <div className={`h-full ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+            {children}
+          </div>
           {variant === 'hover' && renderButtons()}
         </div>
       </div>
