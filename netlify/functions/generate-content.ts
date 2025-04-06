@@ -30,11 +30,11 @@ let journeyCache: IndustryJourneys | null = null;
 // Default prompts if none found in journeys
 const defaultPrompts = {
   whatsapp: "Create an engaging WhatsApp message with emojis",
-  sms: "Write a short message under 160 characters",
+  sms: "Write a short SMS message following this format: '[Brand Name]: [Short, punchy offer or message]. [CTA – what to do next].[Opt-out instructions if required]'",
   push: "Create a brief push notification message",
   card: "Write an engaging card title and description",
   inApp: "Create a welcoming in-app message with clear call to action",
-  email: "Write a compelling email with subject, headline, body, and call to action"
+  email: "Write a compelling email with subject, headline, body (max 2 sentences), and call to action"
 };
 
 function getIndustryJourneys(): IndustryJourneys {
@@ -183,7 +183,12 @@ export const handler: Handler = async (event) => {
           role: 'system',
           content: `You are a marketing copywriter specializing in ${industry} industry content.
           
-          Generate content that follows the specific prompts while incorporating the brand's unique value proposition.
+          Generate content that follows the specific prompts provided for each channel while incorporating the brand's unique value proposition.
+          
+          IMPORTANT GUIDELINES:
+          1. Keep email body text concise - maximum 2 sentences.
+          2. NEVER use placeholders like "[First Name]", "[Product]", or "[Recently Viewed Item]". All content should be ready to view as is.
+          3. For SMS messages, use the provided SMS prompt content to generate the core message. Then, structure the final SMS according to this format: "[Brand Name]: [Generated core message from prompt]. [CTA – what to do next].[Opt-out instructions if required]" Ensure the entire SMS is under 160 characters.
           
           Respond with ONLY a valid JSON object containing content for each channel. No markdown, no backticks.
           {
