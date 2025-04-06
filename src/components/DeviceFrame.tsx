@@ -3,7 +3,6 @@ import { Download, Copy, Check } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { analytics } from '../lib/analytics';
 import type { MarketingContent } from '../types';
-import { useFeatureFlagVariantKey } from 'posthog-js/react';
 
 interface DeviceFrameProps {
   children: React.ReactNode;
@@ -16,9 +15,7 @@ interface DeviceFrameProps {
 const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hideExport = false, isLoading = false }) => {
   const deviceRef = useRef<HTMLDivElement>(null);
   const [isCopying, setIsCopying] = React.useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
-  const variant = useFeatureFlagVariantKey('cta-buttons');
 
   // Extract plain text from title for analytics and filenames
   const getPlainTitle = () => {
@@ -27,10 +24,6 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
     const titleElement = title as React.ReactElement;
     return titleElement.props?.children || 'preview';
   };
-
-  useEffect(() => {
-    console.log('Feature flag "cta-buttons" value:', variant);
-  }, [variant]);
 
   const captureImage = async () => {
     if (!deviceRef.current) return null;
@@ -68,7 +61,6 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
       link.click();
 
       analytics.trackExportClick(channel);
-      setIsHovered(false);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error generating preview:', error);
@@ -102,7 +94,6 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
       // Reset the copying state after a short delay to show the checkmark
       setTimeout(() => {
         setIsCopying(false);
-        setIsHovered(false);
       }, 1000);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -114,46 +105,11 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
         clipboardWriteSupported: !!(navigator.clipboard && navigator.clipboard.write)
       });
       setIsCopying(false);
-      setIsHovered(false);
     }
   };
 
   const renderButtons = () => {
     if (hideExport) return null;
-
-    if (variant === 'hover') {
-      return isHovered && !isCapturing ? (
-        <div 
-          className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-4 transition-opacity duration-200"
-        >
-          <button
-            onClick={handleCopy}
-            className="bg-white text-gray-900 px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors"
-            title="Copy preview"
-          >
-            {isCopying ? (
-              <>
-                <Check className="w-5 h-5 text-green-500" />
-                <span>Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-5 h-5" />
-                <span>Copy to clipboard</span>
-              </>
-            )}
-          </button>
-          <button
-            onClick={handleDownload}
-            className="bg-white text-gray-900 px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors"
-            title="Download preview"
-          >
-            <Download className="w-5 h-5" />
-            <span>Download</span>
-          </button>
-        </div>
-      ) : null;
-    }
 
     return (
       <div className="flex items-center gap-2">
@@ -183,13 +139,11 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
     <div className="max-w-[375px] mx-auto">
       <div className="flex justify-between items-center mb-2">
         {title}
-        {!hideExport && variant !== 'hover' && renderButtons()}
+        {!hideExport && renderButtons()}
       </div>
       <div 
         ref={deviceRef} 
         className="rounded-[3rem] bg-white/50 p-4 shadow-xl border border-white"
-        onMouseEnter={() => !hideExport && setIsHovered(true)}
-        onMouseLeave={() => !hideExport && setIsHovered(false)}
       >
         <div className="relative rounded-[2rem] overflow-hidden h-[700px] bg-white">
           {/* Loading Overlay */}
@@ -202,7 +156,6 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
           <div className={`h-full ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
             {children}
           </div>
-          {variant === 'hover' && renderButtons()}
         </div>
       </div>
     </div>
