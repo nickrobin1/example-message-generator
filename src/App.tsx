@@ -671,172 +671,181 @@ function App() {
 
             {previewMode === 'pitch' ? (
               <PitchViewExport content={content} isLoading={aiLoading}>
-                <div className="flex justify-around items-start gap-4 h-full">
-                  {content.channel_order?.map(channel => {
-                    switch (channel) {
-                      case 'sms':
-                        return content.sms_in_pitch && (
-                          <div key="sms" className="flex flex-col items-center">
-                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.smsGoal || 'SMS'}</h3>
-                            <div className="transform scale-65 origin-top">
-                              <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
-                                <SMSPreview content={content} />
-                              </DeviceFrame>
+                {!content.brandName ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center p-8 bg-white rounded-lg shadow-sm">
+                      <h3 className="text-xl font-semibold text-[#3D1D72] mb-2">No Brand Selected</h3>
+                      <p className="text-gray-600">Search or manually enter a brand to auto generate a pitch</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-around items-start gap-4 h-full">
+                    {content.channel_order?.map(channel => {
+                      switch (channel) {
+                        case 'sms':
+                          return content.sms_in_pitch && (
+                            <div key="sms" className="flex flex-col items-center">
+                              <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.smsGoal || 'SMS'}</h3>
+                              <div className="transform scale-65 origin-top">
+                                <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
+                                  <SMSPreview content={content} />
+                                </DeviceFrame>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      case 'push':
-                        return content.push_in_pitch && (
-                          <div key="push" className="flex flex-col items-center">
-                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.pushGoal || 'Push Notification'}</h3>
-                            <div className="transform scale-65 origin-top">
-                              <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
-                                <div className="relative h-full">
-                                  {/* Gradient Background (z-0) */}
-                                  <div 
-                                    className="absolute inset-0 w-full h-full z-0"
-                                    style={{
-                                      background: `
-                                        radial-gradient(circle at 70% 20%, #FF6B00 0%, transparent 50%),
-                                        radial-gradient(circle at 20% 40%, #FFD600 0%, transparent 50%),
-                                        radial-gradient(circle at 80% 80%, #FF4D6B 0%, transparent 50%),
-                                        radial-gradient(circle at 40% 90%, #FF2D87 0%, transparent 50%),
-                                        linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%)
-                                      `
-                                    }}
-                                  />
+                          );
+                        case 'push':
+                          return content.push_in_pitch && (
+                            <div key="push" className="flex flex-col items-center">
+                              <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.pushGoal || 'Push Notification'}</h3>
+                              <div className="transform scale-65 origin-top">
+                                <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
+                                  <div className="relative h-full">
+                                    {/* Gradient Background (z-0) */}
+                                    <div 
+                                      className="absolute inset-0 w-full h-full z-0"
+                                      style={{
+                                        background: `
+                                          radial-gradient(circle at 70% 20%, #FF6B00 0%, transparent 50%),
+                                          radial-gradient(circle at 20% 40%, #FFD600 0%, transparent 50%),
+                                          radial-gradient(circle at 80% 80%, #FF4D6B 0%, transparent 50%),
+                                          radial-gradient(circle at 40% 90%, #FF2D87 0%, transparent 50%),
+                                          linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%)
+                                        `
+                                      }}
+                                    />
 
-                                  {/* Foreground Content Container (z-10, flex) */}
-                                  <div className="relative z-10 h-full flex flex-col text-white">
-                                    {/* Top Section: Lock & Time */}
-                                    <div className="flex-shrink-0 pt-10 pb-4 px-4">
-                                      <img
-                                        src={lockIcon}
-                                        alt="Lock"
-                                        className="mx-auto w-4 h-4 mb-2"
-                                      />
-                                      <div className="text-center">
+                                    {/* Foreground Content Container (z-10, flex) */}
+                                    <div className="relative z-10 h-full flex flex-col text-white">
+                                      {/* Top Section: Lock & Time */}
+                                      <div className="flex-shrink-0 pt-10 pb-4 px-4">
                                         <img
-                                          src={timeIcon}
-                                          alt="9:41"
-                                          className="w-[72px] mx-auto"
+                                          src={lockIcon}
+                                          alt="Lock"
+                                          className="mx-auto w-4 h-4 mb-2"
                                         />
-                                        <div className="text-[22px] font-normal mt-1 ios-display">Monday, June 3</div>
-                                      </div>
-                                    </div>
-
-                                    {/* Middle Section: Notification */}
-                                    <div className="flex-1 flex items-start justify-center px-4 pt-4">
-                                      <div 
-                                        className="w-full max-w-xs rounded-[16px] p-[14px] ios-font"
-                                        style={{ 
-                                          background: 'rgba(245, 245, 245, 0.3)',
-                                          backdropFilter: 'blur(25px)',
-                                          WebkitBackdropFilter: 'blur(25px)',
-                                          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                                        }}
-                                      >
-                                        {/* Notification inner content: Change to relative, timestamp absolute */}
-                                        <div className="relative flex items-start gap-3">
-                                          {/* Left Side: Icon + Text (Takes full width now) */}
-                                          <div className="flex items-start gap-3 flex-1 min-w-0">
-                                            {content.logoUrl ? (
-                                              <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
-                                                <img 
-                                                  src={content.logoUrl} 
-                                                  alt={content.brandName}
-                                                  className="max-w-full max-h-full object-contain"
-                                                />
-                                              </div>
-                                            ) : (
-                                              <div className="w-[48px] h-[48px] rounded-[12px] bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                                <Building2 className="w-6 h-6 text-gray-400" />
-                                              </div>
-                                            )}
-                                            <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                              <span className="text-[15px] font-semibold leading-none text-black">{content.brandName || '{{Brand Name}}'}</span>
-                                              <p className="text-[15px] leading-[1.2] text-black">
-                                                {content.pushMessage || 'Your message will appear here'}
-                                              </p>
-                                            </div>
-                                          </div>
-                                          {/* Right Side: Timestamp (Absolute position) */}
-                                          <span className="absolute top-0 right-0 text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
+                                        <div className="text-center">
+                                          <img
+                                            src={timeIcon}
+                                            alt="9:41"
+                                            className="w-[72px] mx-auto"
+                                          />
+                                          <div className="text-[22px] font-normal mt-1 ios-display">Monday, June 3</div>
                                         </div>
                                       </div>
-                                    </div>
-                                    
-                                    {/* Bottom Section: Buttons & Swipe */}
-                                    <div className="flex-shrink-0 pb-6 px-4">
-                                      <div className="flex justify-between w-full max-w-[288px] mx-auto mb-2">
-                                        <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
-                                        <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
+
+                                      {/* Middle Section: Notification */}
+                                      <div className="flex-1 flex items-start justify-center px-4 pt-4">
+                                        <div 
+                                          className="w-full max-w-xs rounded-[16px] p-[14px] ios-font"
+                                          style={{ 
+                                            background: 'rgba(245, 245, 245, 0.3)',
+                                            backdropFilter: 'blur(25px)',
+                                            WebkitBackdropFilter: 'blur(25px)',
+                                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                                          }}
+                                        >
+                                          {/* Notification inner content: Change to relative, timestamp absolute */}
+                                          <div className="relative flex items-start gap-3">
+                                            {/* Left Side: Icon + Text (Takes full width now) */}
+                                            <div className="flex items-start gap-3 flex-1 min-w-0">
+                                              {content.logoUrl ? (
+                                                <div className="w-[48px] h-[48px] rounded-[12px] bg-white flex items-center justify-center p-2 flex-shrink-0">
+                                                  <img 
+                                                    src={content.logoUrl} 
+                                                    alt={content.brandName}
+                                                    className="max-w-full max-h-full object-contain"
+                                                  />
+                                                </div>
+                                              ) : (
+                                                <div className="w-[48px] h-[48px] rounded-[12px] bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                  <Building2 className="w-6 h-6 text-gray-400" />
+                                                </div>
+                                              )}
+                                              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                                <span className="text-[15px] font-semibold leading-none text-black">{content.brandName || '{{Brand Name}}'}</span>
+                                                <p className="text-[15px] leading-[1.2] text-black">
+                                                  {content.pushMessage || 'Your message will appear here'}
+                                                </p>
+                                              </div>
+                                            </div>
+                                            {/* Right Side: Timestamp (Absolute position) */}
+                                            <span className="absolute top-0 right-0 text-[13px] text-black/60 whitespace-nowrap flex-shrink-0">34m ago</span>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="text-white/60 text-sm ios-font text-center mb-2">swipe up to open</div>
-                                      <div className="w-32 h-1 bg-white rounded-full mx-auto" />
+                                      
+                                      {/* Bottom Section: Buttons & Swipe */}
+                                      <div className="flex-shrink-0 pb-6 px-4">
+                                        <div className="flex justify-between w-full max-w-[288px] mx-auto mb-2">
+                                          <img src={flashlightIcon} alt="Flashlight" className="w-12 h-12" />
+                                          <img src={cameraIcon} alt="Camera" className="w-12 h-12" />
+                                        </div>
+                                        <div className="text-white/60 text-sm ios-font text-center mb-2">swipe up to open</div>
+                                        <div className="w-32 h-1 bg-white rounded-full mx-auto" />
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </DeviceFrame>
+                                </DeviceFrame>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      case 'email':
-                        return content.email_in_pitch && (
-                          <div key="email" className="flex flex-col items-center">
-                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.emailGoal || 'Email'}</h3>
-                            <div className="transform scale-65 origin-top">
-                              <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
-                                <EmailPreview content={content} />
-                              </DeviceFrame>
+                          );
+                        case 'email':
+                          return content.email_in_pitch && (
+                            <div key="email" className="flex flex-col items-center">
+                              <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.emailGoal || 'Email'}</h3>
+                              <div className="transform scale-65 origin-top">
+                                <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
+                                  <EmailPreview content={content} />
+                                </DeviceFrame>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      case 'card':
-                        return content.card_in_pitch && (
-                          <div key="card" className="flex flex-col items-center">
-                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.cardGoal || 'Card'}</h3>
-                            <div className="transform scale-65 origin-top">
-                              <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
-                                <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
-                                  <CardPreview content={content} />
-                                </div>
-                              </DeviceFrame>
+                          );
+                        case 'card':
+                          return content.card_in_pitch && (
+                            <div key="card" className="flex flex-col items-center">
+                              <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.cardGoal || 'Card'}</h3>
+                              <div className="transform scale-65 origin-top">
+                                <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
+                                  <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
+                                    <CardPreview content={content} />
+                                  </div>
+                                </DeviceFrame>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      case 'in_app':
-                        return content.in_app_in_pitch && (
-                          <div key="in_app" className="flex flex-col items-center">
-                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.inAppGoal || 'In-App'}</h3>
-                            <div className="transform scale-65 origin-top">
-                              <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
-                                <div className="bg-white h-full">
-                                  <InAppPreview 
-                                    content={content} 
-                                    onContentChange={handleInputChange}
-                                  />
-                                </div>
-                              </DeviceFrame>
+                          );
+                        case 'in_app':
+                          return content.in_app_in_pitch && (
+                            <div key="in_app" className="flex flex-col items-center">
+                              <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.inAppGoal || 'In-App'}</h3>
+                              <div className="transform scale-65 origin-top">
+                                <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
+                                  <div className="bg-white h-full">
+                                    <InAppPreview 
+                                      content={content} 
+                                      onContentChange={handleInputChange}
+                                    />
+                                  </div>
+                                </DeviceFrame>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      case 'whatsapp':
-                        return content.whatsapp_in_pitch && (
-                          <div key="whatsapp" className="flex flex-col items-center">
-                            <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.whatsappGoal || 'WhatsApp'}</h3>
-                            <div className="transform scale-65 origin-top">
-                              <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
-                                <WhatsAppPreview content={content} />
-                              </DeviceFrame>
+                          );
+                        case 'whatsapp':
+                          return content.whatsapp_in_pitch && (
+                            <div key="whatsapp" className="flex flex-col items-center">
+                              <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.whatsappGoal || 'WhatsApp'}</h3>
+                              <div className="transform scale-65 origin-top">
+                                <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
+                                  <WhatsAppPreview content={content} />
+                                </DeviceFrame>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      default:
-                        return null;
-                    }
-                  })}
-                </div>
+                          );
+                        default:
+                          return null;
+                      }
+                    })}
+                  </div>
+                )}
               </PitchViewExport>
             ) : (
               <>
