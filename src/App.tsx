@@ -48,6 +48,7 @@ function App() {
   const [domainInput, setDomainInput] = useState('');
   const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
   const domainInputRef = useRef<HTMLInputElement>(null);
+  const [isPitchModeEnabled, setIsPitchModeEnabled] = useState(false);
   const [content, setContent] = useState<MarketingContent>({
     brandName: '',
     brandDescription: '',
@@ -107,6 +108,26 @@ function App() {
       setShouldGenerateContent(false);
     }
   }, [content.brandDescription, shouldGenerateContent]);
+
+  useEffect(() => {
+    // Check if pitch mode is enabled via feature flag
+    const checkPitchMode = () => {
+      const isEnabled = posthog.isFeatureEnabled('pitch-mode') || false;
+      setIsPitchModeEnabled(isEnabled);
+    };
+
+    // Check immediately
+    checkPitchMode();
+
+    // Subscribe to feature flag changes
+    const unsubscribe = posthog.onFeatureFlags(() => {
+      checkPitchMode();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const handleInputChange = async (field: keyof MarketingContent, value: string | string[]) => {
     setContent(prev => {
@@ -621,30 +642,32 @@ function App() {
             }`}
           >
             {/* Preview Mode Toggle */}
-            <div className="flex justify-center">
-              <div className="inline-flex p-1 space-x-1 bg-white rounded-lg shadow-sm">
-                <button
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    previewMode === 'single'
-                      ? 'bg-[#3D1D72] text-white'
-                      : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
-                  }`}
-                  onClick={() => setPreviewMode('single')}
-                >
-                  <span>Single</span>
-                </button>
-                <button
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    previewMode === 'pitch'
-                      ? 'bg-[#3D1D72] text-white'
-                      : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
-                  }`}
-                  onClick={() => setPreviewMode('pitch')}
-                >
-                  <span>Pitch View</span>
-                </button>
+            {isPitchModeEnabled && (
+              <div className="flex justify-center">
+                <div className="inline-flex p-1 space-x-1 bg-white rounded-lg shadow-sm">
+                  <button
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      previewMode === 'single'
+                        ? 'bg-[#3D1D72] text-white'
+                        : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+                    }`}
+                    onClick={() => setPreviewMode('single')}
+                  >
+                    <span>Single</span>
+                  </button>
+                  <button
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      previewMode === 'pitch'
+                        ? 'bg-[#3D1D72] text-white'
+                        : 'text-gray-600 hover:text-[#3D1D72] hover:bg-gray-100'
+                    }`}
+                    onClick={() => setPreviewMode('pitch')}
+                  >
+                    <span>Pitch View</span>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {previewMode === 'pitch' ? (
               <PitchViewExport content={content} isLoading={aiLoading}>
