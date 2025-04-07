@@ -9,4 +9,6 @@ posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
   }
 });
 
+window.posthog = posthog;
+
 export { posthog }; 
