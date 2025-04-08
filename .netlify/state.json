@@ -1,7 +1,7 @@
 {
 	"geolocation": {
 		"data": {
-			"city": "Oakland",
+			"city": "Redwood City",
 			"country": {
 				"code": "US",
 				"name": "United States"
@@ -11,10 +11,10 @@
 				"name": "California"
 			},
 			"timezone": "America/Los_Angeles",
-			"latitude": 37.7794,
-			"longitude": -122.2178,
-			"postalCode": "94601"
+			"latitude": 37.5313,
+			"longitude": -122.2501,
+			"postalCode": "94065"
 		},
-		"timestamp": 1743702881700
+		"timestamp": 1744140243069
 	}
 }

@@ -4,7 +4,8 @@ import { toPng } from 'html-to-image';
 import { analytics } from '../lib/analytics';
 import type { MarketingContent } from '../types';
 import DeviceFrame from './DeviceFrame';
-import JSConfetti from 'js-confetti';
+// import JSConfetti from 'js-confetti';
+import brazeLogo from '/public/Braze_logo_B.png';
 
 interface PitchViewExportProps {
   content: MarketingContent;
@@ -16,14 +17,14 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
   const [isCopying, setIsCopying] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  const jsConfettiRef = useRef<JSConfetti | null>(null);
+  // const jsConfettiRef = useRef<JSConfetti | null>(null);
 
-  useEffect(() => {
-    jsConfettiRef.current = new JSConfetti();
-    return () => {
-      jsConfettiRef.current = null;
-    };
-  }, []);
+  // useEffect(() => {
+  //   jsConfettiRef.current = new JSConfetti();
+  //   return () => {
+  //     jsConfettiRef.current = null;
+  //   };
+  // }, []);
 
   const captureGrid = async () => {
     setIsCapturing(true);
@@ -53,11 +54,11 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
       link.click();
 
       // Trigger confetti animation for download
-      jsConfettiRef.current?.addConfetti({
-        emojis: ['💰', '💸', '💵'],
-        emojiSize: 100,
-        confettiNumber: 100,
-      });
+      // jsConfettiRef.current?.addConfetti({
+      //   emojis: ['💰', '💸', '💵'],
+      //   emojiSize: 100,
+      //   confettiNumber: 100,
+      // });
 
       analytics.trackExportClick('pitch-view');
     } catch (error) {
@@ -84,11 +85,11 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
       ]);
 
       // Trigger confetti animation for copy
-      jsConfettiRef.current?.addConfetti({
-        emojis: ['💰', '💸', '💵'],
-        emojiSize: 100,
-        confettiNumber: 100,
-      });
+      // jsConfettiRef.current?.addConfetti({
+      //   emojis: ['💰', '💸', '💵'],
+      //   emojiSize: 100,
+      //   confettiNumber: 100,
+      // });
 
       analytics.trackCopyClick('pitch-view');
       
@@ -140,7 +141,7 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
       </div>
       <div 
         ref={gridRef} 
-        className="bg-white rounded-lg overflow-hidden border border-gray-200"
+        className="bg-white rounded-lg overflow-hidden border border-gray-200 relative"
         style={{ 
           aspectRatio: '16/9',
           width: '100%',
@@ -148,6 +149,11 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
           margin: '0 auto'
         }}
       >
+        {/* Braze Logo */}
+        <div className="absolute top-8 right-8">
+          <img src={brazeLogo} alt="Braze" className="w-20 object-contain" />
+        </div>
+
         <div className="p-8 h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center gap-6 mb-8">
