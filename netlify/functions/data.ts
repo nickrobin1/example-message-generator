@@ -61,11 +61,11 @@ export const industryJourneys: IndustryJourneys = {
       "use_case": "App Download and First Purchase",
       "steps": {
         "Email": {
-          "Goal": "Incentivize app download with promo",
+          "Goal": "Incentivize app download with promotion",
           "Prompt": "Write a promotional email welcoming user, introducing the first-order discount and inviting the user to download the app."
         },
         "Content Card": {
-          "Goal": "Prompt popular items to the user in feed",
+          "Goal": "Prompt popular items to the customer in app",
           "Prompt": "Create a content card promoting popular items and reminding user they can apply their promo code."
         },
         "Push": {
@@ -79,7 +79,7 @@ export const industryJourneys: IndustryJourneys = {
       "use_case": "Drive Direct Deposit Set-Up",
       "steps": {
         "In-App": {
-          "Goal": "Prime for Push Opt-In",
+          "Goal": "Increase push opt-ins with a push primer",
           "Prompt": "Create an in-app message that educates user on benefits of opting into push notifications with this brand and asks them to opt in.",
           "Type": "Modal with Logo"
         },
@@ -107,11 +107,11 @@ export const industryJourneys: IndustryJourneys = {
           "Type": "Email Capture"
         },
         "Email": {
-          "Goal": "Recover booking, push app download",
+          "Goal": "Recover booking",
           "Prompt": "Write a two-part email: first, a reminder to finish booking their trip; second, an invitation to download the app for itinerary tracking and travel updates."
         },
         "Content Card": {
-          "Goal": "Cross-sell trip add-ons",
+          "Goal": "Cross-sell with trip add-ons",
           "Prompt": "Create an in-app content card suggesting popular add-ons such as dinner reservations or local experiences."
         }
       }
@@ -143,7 +143,7 @@ export const industryJourneys: IndustryJourneys = {
           "Prompt": "Send a welcome email confirming the user's new plan and outlining their benefits and promoting app download."
         },
         "SMS": {
-          "Goal": "Alert user of first bill",
+          "Goal": "Alert customer of first bill",
           "Prompt": "Write a brief SMS alerting the user that their first bill is ready and where to view it."
         },
         "In-App": {
