@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Download, Copy, Check } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { analytics } from '../lib/analytics';
 import type { MarketingContent } from '../types';
 import DeviceFrame from './DeviceFrame';
+import JSConfetti from 'js-confetti';
 
 interface PitchViewExportProps {
   content: MarketingContent;
@@ -15,6 +16,14 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
   const [isCopying, setIsCopying] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
+  const jsConfettiRef = useRef<JSConfetti | null>(null);
+
+  useEffect(() => {
+    jsConfettiRef.current = new JSConfetti();
+    return () => {
+      jsConfettiRef.current = null;
+    };
+  }, []);
 
   const captureGrid = async () => {
     setIsCapturing(true);
@@ -43,6 +52,13 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
       link.href = image;
       link.click();
 
+      // Trigger confetti animation for download
+      jsConfettiRef.current?.addConfetti({
+        emojis: ['💰', '💸', '💵'],
+        emojiSize: 100,
+        confettiNumber: 100,
+      });
+
       analytics.trackExportClick('pitch-view');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -66,6 +82,13 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
           [blob.type]: blob
         })
       ]);
+
+      // Trigger confetti animation for copy
+      jsConfettiRef.current?.addConfetti({
+        emojis: ['💰', '💸', '💵'],
+        emojiSize: 100,
+        confettiNumber: 100,
+      });
 
       analytics.trackCopyClick('pitch-view');
       
