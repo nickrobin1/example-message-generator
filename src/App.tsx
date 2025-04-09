@@ -536,7 +536,11 @@ function App() {
                           <option value="Restaurants & On-Demand">Restaurants & On-Demand</option>
                           <option value="Financial Services">Financial Services</option>
                           <option value="Travel & Hospitality">Travel & Hospitality</option>
+                          <option value="Telecommunications">Telecommunications</option>
+                          <option value="Education">Education</option>
                           <option value="Other Industries">Other Industries</option>
+                          <option value="Gaming">Gaming</option>
+                          <option value="Insurance">Insurance</option>
                         </select>
                       </div>
                     </div>
