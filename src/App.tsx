@@ -44,6 +44,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showVideoDemo, setShowVideoDemo] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   const [domainInput, setDomainInput] = useState('');
   const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
@@ -981,8 +982,8 @@ function App() {
           </div>
         </div>
 
-        {/* Feedback Button */}
-        <div className="fixed bottom-4 right-4">
+        {/* Feedback and Demo Buttons */}
+        <div className="fixed bottom-4 right-4 flex gap-2">
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSdrw8jpZMNFU3GMj_u3gnSTh5cDtLmWmlI5fHi-eZMDLDV5DQ/viewform"
             target="_blank"
@@ -993,7 +994,41 @@ function App() {
             <MessageCircle className="w-4 h-4" />
             <span>Share Feedback</span>
           </a>
+          {posthog?.isFeatureEnabled('video-demo') && (
+            <button
+              onClick={() => {
+                setShowVideoDemo(!showVideoDemo);
+                analytics.track('demo_video_click', { action: !showVideoDemo ? 'open' : 'close' });
+              }}
+              className="flex items-center gap-2 bg-[#3D1D72] text-white px-4 py-2 rounded-full hover:bg-[#2D1655] transition-colors"
+            >
+              <Video className="w-4 h-4" />
+              <span>Demo</span>
+            </button>
+          )}
         </div>
+
+        {/* Video Demo Modal */}
+        {showVideoDemo && posthog?.isFeatureEnabled('video-demo') && (
+          <div className="fixed bottom-20 right-4 z-50 bg-white rounded-lg shadow-lg p-4 w-[400px]">
+            <button
+              onClick={() => setShowVideoDemo(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="relative overflow-hidden aspect-[1/1]">
+              <iframe
+                src="https://share.synthesia.io/embeds/videos/609fbd16-2cf2-4549-88b3-0cdf2f8953e8"
+                loading="lazy"
+                title="Braze Preview Demo"
+                allowFullScreen
+                allow="encrypted-media; fullscreen;"
+                className="absolute w-full h-full top-0 left-0 border-none p-0 m-0 overflow-hidden"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </PostHogProvider>
   );

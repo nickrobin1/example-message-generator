@@ -1,14 +1,8 @@
-import React from 'react';
-import { X } from 'lucide-react';
-import { Wand2 } from 'lucide-react';
+// Use lucide-react icons
+import { X, Wand2 } from 'lucide-react';
 import step1Gif from '../assets/step-1.gif';
 import step2Gif from '../assets/step-2.gif';
 import step3Gif from '../assets/step-3a.gif';
-
-// Use current origin in production, fallback to localhost for development
-const API_BASE_URL = import.meta.env.PROD 
-  ? window.location.origin
-  : 'http://localhost:8888';
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -87,7 +81,15 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
         </div>
 
         <div className="pt-4 border-t mt-8 text-sm text-gray-500 text-center">
-          built by nick robin 🫡 happy prospecting
+          Want to contribute to this project? Check out our{' '}
+          <a 
+            href="https://github.com/nickrobin1/example-message-generator" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[#3D1D72] hover:underline"
+          >
+            GitHub
+          </a>
         </div>
       </div>
     </div>

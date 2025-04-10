@@ -8,6 +8,7 @@ export type AnalyticsEvent =
   | 'copy_click'
   | 'feedback_submit'
   | 'error_occurred'
+  | 'demo_video_click'
 
 // Helper function to check if PostHog is available
 const isPostHogAvailable = () => {
@@ -112,6 +113,22 @@ export const analytics = {
       posthog.capture('feedback_submit', {
         feedback_type: feedbackType,
         feedback_text: feedbackText,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      // Silent error handling
+    }
+  },
+
+  // Generic track event
+  track: (eventName: string, properties?: Record<string, any>) => {
+    try {
+      if (!isPostHogAvailable()) {
+        return;
+      }
+
+      posthog.capture(eventName, {
+        ...properties,
         timestamp: new Date().toISOString()
       });
     } catch (error) {
