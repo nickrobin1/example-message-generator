@@ -3,28 +3,44 @@ import { Download, Copy, Check } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { analytics } from '../lib/analytics';
 import type { MarketingContent } from '../types';
-import DeviceFrame from './DeviceFrame';
-// import JSConfetti from 'js-confetti';
+import JSConfetti from 'js-confetti';
 import brazeLogo from '/public/Braze_logo_B.png';
+import { usePostHog } from 'posthog-js/react';
 
 interface PitchViewExportProps {
   content: MarketingContent;
   children: React.ReactNode;
-  isLoading?: boolean;
 }
 
-const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, isLoading = false }) => {
+const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children }) => {
   const [isCopying, setIsCopying] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  // const jsConfettiRef = useRef<JSConfetti | null>(null);
+  const jsConfettiRef = useRef<JSConfetti | null>(null);
+  const posthog = usePostHog();
 
-  // useEffect(() => {
-  //   jsConfettiRef.current = new JSConfetti();
-  //   return () => {
-  //     jsConfettiRef.current = null;
-  //   };
-  // }, []);
+  useEffect(() => {
+    jsConfettiRef.current = new JSConfetti();
+    return () => {
+      jsConfettiRef.current = null;
+    };
+  }, []);
+
+  const showConfetti = () => {
+    const isConfettiEnabled = posthog?.isFeatureEnabled('confetti');
+    if (!isConfettiEnabled) return;
+
+    const hasSeenConfetti = localStorage.getItem('has_seen_confetti');
+    if (hasSeenConfetti) return;
+
+    jsConfettiRef.current?.addConfetti({
+      emojis: ['💰', '💸', '💵'],
+      emojiSize: 100,
+      confettiNumber: 100,
+    });
+
+    localStorage.setItem('has_seen_confetti', 'true');
+  };
 
   const captureGrid = async () => {
     setIsCapturing(true);
@@ -53,12 +69,7 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
       link.href = image;
       link.click();
 
-      // Trigger confetti animation for download
-      // jsConfettiRef.current?.addConfetti({
-      //   emojis: ['💰', '💸', '💵'],
-      //   emojiSize: 100,
-      //   confettiNumber: 100,
-      // });
+      showConfetti();
 
       analytics.trackExportClick('pitch-view');
     } catch (error) {
@@ -84,12 +95,7 @@ const PitchViewExport: React.FC<PitchViewExportProps> = ({ content, children, is
         })
       ]);
 
-      // Trigger confetti animation for copy
-      // jsConfettiRef.current?.addConfetti({
-      //   emojis: ['💰', '💸', '💵'],
-      //   emojiSize: 100,
-      //   confettiNumber: 100,
-      // });
+      showConfetti();
 
       analytics.trackCopyClick('pitch-view');
       
