@@ -80,6 +80,7 @@ function App() {
   const [shouldGenerateContent, setShouldGenerateContent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'single' | 'pitch'>('single');
+  const [processToastId, setProcessToastId] = useState<string | null>(null);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -164,8 +165,8 @@ function App() {
     }
   };
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
-    toast.custom(
+  const showToast = (message: string, type: 'success' | 'error' | 'warning', id?: string) => {
+    const toastId = id || toast.custom(
       (t) => (
         <div
           className={`${
@@ -197,6 +198,39 @@ function App() {
       ),
       { duration: type === 'error' ? 10000 : 4000 }
     );
+
+    if (id) {
+      toast.custom(
+        (t) => (
+          <div
+            className={`${
+              t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {message}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-500 focus:outline-none"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        ),
+        { id, duration: type === 'error' ? 10000 : 4000 }
+      );
+    }
+
+    return toastId;
   };
 
   const handleBrandLookup = async (domain: string) => {
@@ -208,34 +242,12 @@ function App() {
     // Track the brand lookup attempt
     analytics.trackBrandLookup(domain);
 
-    // Check if this is a test domain
-    if (domain in brandSeeds) {
-      const seedData = brandSeeds[domain as keyof typeof brandSeeds];
-      
-      setContent(prev => ({
-        ...prev,
-        brandName: seedData.name,
-        logoUrl: seedData.logo,
-        smsIcon: seedData.logo,
-        pushIcon: seedData.logo,
-        whatsappIcon: seedData.logo,
-        brandDescription: seedData.longDescription,
-        brandColor: seedData.colors?.primary || '#3D1D72',
-        emailImage: seedData.contentImage || prev.emailImage,
-        cardImage: seedData.contentImage || prev.cardImage,
-        inAppImage: seedData.contentImage || prev.inAppImage
-      }));
-
-      showToast('Brand information updated successfully!', 'success');
-      setIsManualEntryOpen(true);
-      setShouldGenerateContent(true);
-      return;
-    }
+    // Create or update the process toast
+    const toastId = processToastId || showToast('Looking up brand...', 'success');
+    setProcessToastId(toastId);
 
     setLoading(true);
     setError(null);
-    showToast('Looking up brand...', 'success');
-
     try {
       const sanitizedDomain = sanitizeDomain(domain);
       const requestUrl = `${API_BASE_URL}/.netlify/functions/brand-lookup/${encodeURIComponent(sanitizedDomain)}`;
@@ -250,7 +262,7 @@ function App() {
       
       if (!data.name && !data.logo) {
         const errorMessage = 'No brand information found. Please enter details manually.';
-        showToast(errorMessage, 'error');
+        showToast(errorMessage, 'error', toastId);
         setIsManualEntryOpen(true);
         analytics.trackError('brand_lookup_failed', errorMessage, {
           domain,
@@ -263,7 +275,7 @@ function App() {
       const description = data.longDescription || data.description;
       if (!description) {
         const errorMessage = 'No brand description found. Please enter details manually.';
-        showToast(errorMessage, 'error');
+        showToast(errorMessage, 'error', toastId);
         setIsManualEntryOpen(true);
         analytics.trackError('brand_lookup_failed', errorMessage, {
           domain,
@@ -317,13 +329,13 @@ function App() {
           });
       }
 
-      showToast('Brand information updated successfully!', 'success');
+      showToast('Brand information updated successfully!', 'success', toastId);
       setIsManualEntryOpen(true);
       setShouldGenerateContent(true);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch brand information';
       console.error('Brand lookup error:', error);
-      showToast('We were unable to lookup brand, please insert the brand info manually.', 'error');
+      showToast('We were unable to lookup brand, please insert the brand info manually.', 'error', toastId);
       setIsManualEntryOpen(true);
       analytics.trackError('brand_lookup_failed', errorMessage, {
         domain,
@@ -332,13 +344,17 @@ function App() {
       });
     } finally {
       setLoading(false);
+      setProcessToastId(null);
     }
   };
 
   const handleGenerateContent = async () => {
     setAiLoading(true);
     setError(null);
-    showToast('Generating content...', 'success');
+    
+    // Create or update the process toast
+    const toastId = processToastId || showToast('Generating content...', 'success');
+    setProcessToastId(toastId);
 
     try {
       const generatedContent = await generateMarketingContent(
@@ -357,12 +373,12 @@ function App() {
       }));
 
       analytics.trackGenerateClick();
-      showToast('Content generated successfully!', 'success');
+      showToast('Content generated successfully!', 'success', toastId);
     } catch (error) {
       console.error('Error generating content:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate content';
       setError(errorMessage);
-      showToast(errorMessage, 'error');
+      showToast(errorMessage, 'error', toastId);
       analytics.trackError('content_generation_failed', errorMessage, {
         brandName: content.brandName,
         industry: content.industry,
@@ -371,6 +387,7 @@ function App() {
       });
     } finally {
       setAiLoading(false);
+      setProcessToastId(null);
     }
   };
 
