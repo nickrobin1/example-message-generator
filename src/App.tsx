@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Video, User, Building2, MessageCircle, Search, Wand2, X, XCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, Video, Building2, MessageCircle, Search, X, XCircle } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { PostHogProvider } from 'posthog-js/react';
 import { posthog } from './lib/posthog';
@@ -11,17 +11,14 @@ import CardEditor from './components/channels/CardEditor';
 import InAppEditor from './components/channels/InAppEditor';
 import InAppPreview from './components/channels/InAppPreview';
 import WelcomeModal from './components/WelcomeModal';
-import { getCurrentTime } from './utils/time';
 import { generateMarketingContent, determineIndustry } from './utils/ai';
 import type { MarketingContent, BrandFetchResponse } from './types';
-import wallpaperImage from './assets/iOS wallpaper.png';
 import flashlightIcon from './assets/Flashlight button.svg';
 import cameraIcon from './assets/Camera button.svg';
 import lockIcon from './assets/lock.svg';
 import timeIcon from './assets/Time.svg';
 import brazeLogoIcon from './assets/Braze Logo Icon.png';
 import { brandSeeds } from './data/brandSeeds';
-import FakeBrandAutocomplete from './components/FakeBrandAutocomplete';
 import SMSPreview from './components/channels/SMSPreview';
 import { analytics } from './lib/analytics';
 import EmailEditor from './components/channels/EmailEditor';
@@ -45,7 +42,6 @@ function App() {
   const [aiLoading, setAiLoading] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [showVideoDemo, setShowVideoDemo] = useState(false);
-  const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   const [domainInput, setDomainInput] = useState('');
   const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
   const domainInputRef = useRef<HTMLInputElement>(null);
@@ -83,17 +79,7 @@ function App() {
   });
   const [shouldGenerateContent, setShouldGenerateContent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [icons, setIcons] = useState({
-    sms: '',
-    push: '',
-    whatsapp: ''
-  });
   const [previewMode, setPreviewMode] = useState<'single' | 'pitch'>('single');
-  const smsPreviewRef = useRef<HTMLDivElement>(null);
-  const pushPreviewRef = useRef<HTMLDivElement>(null);
-  const emailPreviewRef = useRef<HTMLDivElement>(null);
-  const cardPreviewRef = useRef<HTMLDivElement>(null);
-  const inAppPreviewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -370,7 +356,6 @@ function App() {
         ...generatedContent
       }));
 
-      setHasGeneratedContent(true);
       analytics.trackGenerateClick();
       showToast('Content generated successfully!', 'success');
     } catch (error) {
@@ -509,19 +494,11 @@ function App() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-2">Brand Name</label>
-                        <FakeBrandAutocomplete
+                        <input
+                          type="text"
                           value={content.brandName}
-                          onChange={(value) => handleInputChange('brandName', value)}
-                          onSelectBrand={(brand) => {
-                            analytics.trackBrandLookup(brand.name);
-                            setContent(prev => ({
-                              ...prev,
-                              brandName: brand.name,
-                              logoUrl: `/src/assets/Fake Brands/${brand.image}`,
-                              brandDescription: brand.description,
-                              brandColor: brand.colors?.primary || '#3D1D72'
-                            }));
-                          }}
+                          onChange={(e) => handleInputChange('brandName', e.target.value)}
+                          className="w-full rounded-lg border-gray-200 shadow-sm focus:border-[#3D1D72] focus:ring-[#3D1D72] text-sm"
                         />
                       </div>
                       <div>

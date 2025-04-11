@@ -30,7 +30,7 @@ export default function ImageInput({ value, onChange, label, placeholder }: Imag
       {value ? (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded overflow-hidden">
-            <img src={value} alt="" className="w-full h-full object-cover" />
+            <img src={value} alt="" className="w-full h-full object-contain" />
           </div>
           <button
             onClick={() => onChange('')}
