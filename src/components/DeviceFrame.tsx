@@ -136,7 +136,7 @@ const DeviceFrame: React.FC<DeviceFrameProps> = ({ children, title, content, hid
   };
 
   return (
-    <div className="max-w-[375px] mx-auto">
+    <div className="w-[375px] mx-auto">
       <div className="flex justify-between items-center mb-2">
         {title}
         {!hideExport && renderButtons()}

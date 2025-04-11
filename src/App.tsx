@@ -678,7 +678,7 @@ function App() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex justify-around items-start gap-4 h-full">
+                  <div className="flex justify-around items-start gap-4 h-full scale-[0.65]">
                     {content.channel_order?.map(channel => {
                       switch (channel) {
                         case 'sms':
