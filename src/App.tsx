@@ -685,7 +685,7 @@ function App() {
                           return content.sms_in_pitch && (
                             <div key="sms" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.smsGoal || 'SMS'}</h3>
-                              <div className="transform scale-65 origin-top">
+                              <div className="transform scale-75 md:scale-65 lg:scale-50 xl:scale-45 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
                                   <SMSPreview content={content} />
                                 </DeviceFrame>
@@ -696,7 +696,7 @@ function App() {
                           return content.push_in_pitch && (
                             <div key="push" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.pushGoal || 'Push Notification'}</h3>
-                              <div className="transform scale-65 origin-top">
+                              <div className="transform scale-75 md:scale-65 lg:scale-50 xl:scale-45 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
                                   <div className="relative h-full">
                                     {/* Gradient Background (z-0) */}
@@ -792,7 +792,7 @@ function App() {
                           return content.email_in_pitch && (
                             <div key="email" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.emailGoal || 'Email'}</h3>
-                              <div className="transform scale-65 origin-top">
+                              <div className="transform scale-75 md:scale-65 lg:scale-50 xl:scale-45 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
                                   <EmailPreview content={content} />
                                 </DeviceFrame>
@@ -803,7 +803,7 @@ function App() {
                           return content.card_in_pitch && (
                             <div key="card" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.cardGoal || 'Card'}</h3>
-                              <div className="transform scale-65 origin-top">
+                              <div className="transform scale-75 md:scale-65 lg:scale-50 xl:scale-45 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
                                   <div className="flex items-center justify-center h-full bg-[#F8F6FF] p-4">
                                     <CardPreview content={content} />
@@ -816,7 +816,7 @@ function App() {
                           return content.in_app_in_pitch && (
                             <div key="in_app" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.inAppGoal || 'In-App'}</h3>
-                              <div className="transform scale-65 origin-top">
+                              <div className="transform scale-75 md:scale-65 lg:scale-50 xl:scale-45 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
                                   <div className="bg-white h-full">
                                     <InAppPreview 
@@ -832,7 +832,7 @@ function App() {
                           return content.whatsapp_in_pitch && (
                             <div key="whatsapp" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.whatsappGoal || 'WhatsApp'}</h3>
-                              <div className="transform scale-65 origin-top">
+                              <div className="transform scale-75 md:scale-65 lg:scale-50 xl:scale-45 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
                                   <WhatsAppPreview content={content} />
                                 </DeviceFrame>
