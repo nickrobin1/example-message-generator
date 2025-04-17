@@ -683,7 +683,7 @@ function App() {
                       switch (channel) {
                         case 'sms':
                           return content.sms_in_pitch && (
-                            <div key="sms" className="flex flex-col items-center">
+                            <div key="sms" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.smsGoal || 'SMS'}</h3>
                               <div className="transform scale-65 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
@@ -694,7 +694,7 @@ function App() {
                           );
                         case 'push':
                           return content.push_in_pitch && (
-                            <div key="push" className="flex flex-col items-center">
+                            <div key="push" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.pushGoal || 'Push Notification'}</h3>
                               <div className="transform scale-65 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
@@ -790,7 +790,7 @@ function App() {
                           );
                         case 'email':
                           return content.email_in_pitch && (
-                            <div key="email" className="flex flex-col items-center">
+                            <div key="email" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.emailGoal || 'Email'}</h3>
                               <div className="transform scale-65 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
@@ -801,7 +801,7 @@ function App() {
                           );
                         case 'card':
                           return content.card_in_pitch && (
-                            <div key="card" className="flex flex-col items-center">
+                            <div key="card" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.cardGoal || 'Card'}</h3>
                               <div className="transform scale-65 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
@@ -814,7 +814,7 @@ function App() {
                           );
                         case 'in_app':
                           return content.in_app_in_pitch && (
-                            <div key="in_app" className="flex flex-col items-center">
+                            <div key="in_app" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.inAppGoal || 'In-App'}</h3>
                               <div className="transform scale-65 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
@@ -830,7 +830,7 @@ function App() {
                           );
                         case 'whatsapp':
                           return content.whatsapp_in_pitch && (
-                            <div key="whatsapp" className="flex flex-col items-center">
+                            <div key="whatsapp" className="flex flex-col items-center flex-1">
                               <h3 className="text-2xl font-bold text-[#3D1D72] mb-4 text-center min-h-[64px] flex items-center justify-center">{content.whatsappGoal || 'WhatsApp'}</h3>
                               <div className="transform scale-65 origin-top">
                                 <DeviceFrame title={null} content={content} hideExport isLoading={aiLoading}>
